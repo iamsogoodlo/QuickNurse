@@ -7,6 +7,7 @@ import AuthPage from './pages/AuthPage';
 import PatientDashboardPage from './pages/PatientDashboardPage';
 import NurseDashboardPage from './pages/NurseDashboardPage';
 import NurseSettingsPage from './pages/NurseSettingsPage';
+import PatientSettingsPage from './pages/PatientSettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuth } from './hooks/useAuth';
@@ -20,13 +21,21 @@ const App: React.FC = () => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<AuthPage />} />
         
-        <Route 
-          path="/patient/dashboard" 
+        <Route
+          path="/patient/dashboard"
           element={
             <ProtectedRoute userType="patient">
               <PatientDashboardPage />
             </ProtectedRoute>
-          } 
+          }
+        />
+        <Route
+          path="/patient/settings"
+          element={
+            <ProtectedRoute userType="patient">
+              <PatientSettingsPage />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/nurse/dashboard"
