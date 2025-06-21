@@ -5,66 +5,993 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuickNurse - Nurse Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=geometry,places"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-gray-50 min-h-screen p-6">
-    <h1 class="text-2xl font-bold mb-4">Nurse Dashboard</h1>
-    <div id="stats" class="bg-white rounded-lg shadow p-4 mb-6 w-full max-w-md">
-        <p class="mb-2">Monthly Revenue: <span id="monthly-revenue" class="font-semibold">$0</span></p>
-        <p class="mb-2">Jobs Taken: <span id="monthly-jobs" class="font-semibold">0</span></p>
-        <p>Rating: <span id="rating" class="font-semibold">0</span> / 5</p>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-indigo-600">QuickNurse</h1>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                            <span id="nurse-initials" class="text-indigo-600 font-bold text-sm">SJ</span>
+                        </div>
+                        <span id="nurse-name" class="font-medium">Sarah Johnson</span>
+                    </div>
+                    <button onclick="openSettings()" class="text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-cog text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Panel - Controls & Stats -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Online/Offline Toggle -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="text-center">
+                        <div class="mb-4">
+                            <span id="status-text" class="text-lg font-medium text-gray-600">You're offline</span>
+                        </div>
+                        
+                        <button id="toggle-online" onclick="toggleOnlineStatus()" 
+                                class="w-32 h-32 rounded-full border-4 bg-gray-100 border-gray-300 flex items-center justify-center transition-all duration-300 hover:scale-105">
+                            <div class="text-center">
+                                <i id="toggle-icon" class="fas fa-power-off text-3xl text-gray-500 mb-2"></i>
+                                <div id="toggle-text" class="text-sm font-medium text-gray-600">GO ONLINE</div>
+                            </div>
+                        </button>
+                        
+                        <div class="mt-4">
+                            <p class="text-sm text-gray-500">Tap to start receiving patient requests</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Earnings Summary -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h2 class="text-lg font-semibold mb-4">Today's Earnings</h2>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Total Earned</span>
+                            <span id="today-earnings" class="text-2xl font-bold text-green-600">$0</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Patients Served</span>
+                            <span id="today-patients" class="text-lg font-semibold">0</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Hours Online</span>
+                            <span id="hours-online" class="text-lg font-semibold">0h 0m</span>
+                        </div>
+                        
+                        <div class="border-t pt-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">This Week</span>
+                                <span id="week-earnings" class="text-xl font-bold text-indigo-600">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Earnings Goal Progress -->
+                    <div class="mt-6">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-gray-600">Daily Goal</span>
+                            <span id="goal-progress" class="font-medium">$0 / $200</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="goal-progress-bar" class="bg-green-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h2 class="text-lg font-semibold mb-4">Performance</h2>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Rating</span>
+                            <div class="flex items-center">
+                                <span class="text-yellow-500 mr-1">★</span>
+                                <span id="nurse-rating" class="font-semibold">4.8</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Acceptance Rate</span>
+                            <span id="acceptance-rate" class="font-semibold text-green-600">95%</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Completion Rate</span>
+                            <span id="completion-rate" class="font-semibold text-blue-600">98%</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Response Time</span>
+                            <span id="response-time" class="font-semibold">12s avg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h2 class="text-lg font-semibold mb-4">Quick Actions</h2>
+                    
+                    <div class="space-y-3">
+                        <button onclick="viewHistory()" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="flex items-center">
+                                <i class="fas fa-history text-gray-500 mr-3"></i>
+                                <span>View History</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </button>
+                        
+                        <button onclick="viewEarnings()" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="flex items-center">
+                                <i class="fas fa-dollar-sign text-gray-500 mr-3"></i>
+                                <span>Earnings Details</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </button>
+                        
+                        <button onclick="updateProfile()" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="flex items-center">
+                                <i class="fas fa-user text-gray-500 mr-3"></i>
+                                <span>Update Profile</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </button>
+                        
+                        <button onclick="getSupport()" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="flex items-center">
+                                <i class="fas fa-headset text-gray-500 mr-3"></i>
+                                <span>Get Support</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Map & Active Request -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Active Request Card -->
+                <div id="active-request-card" class="bg-white rounded-2xl shadow-lg p-6 hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold">Current Request</h2>
+                        <span id="request-status" class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                            En Route
+                        </span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="font-medium mb-2">Patient Information</h3>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Name:</span>
+                                    <span id="patient-name" class="font-medium">John Doe</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Service:</span>
+                                    <span id="request-service" class="font-medium">Blood Pressure Check</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Urgency:</span>
+                                    <span id="request-urgency" class="font-medium">Normal</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Payment:</span>
+                                    <span id="request-payment" class="font-medium text-green-600">$45</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-medium mb-2">Location & Timing</h3>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Distance:</span>
+                                    <span id="request-distance" class="font-medium">2.3 miles</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">ETA:</span>
+                                    <span id="request-eta" class="font-medium text-green-600">8 minutes</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Address:</span>
+                                    <span id="request-address" class="font-medium">123 Main St</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-4 mt-6">
+                        <button onclick="callPatient()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 flex items-center justify-center">
+                            <i class="fas fa-phone mr-2"></i>
+                            Call Patient
+                        </button>
+                        <button onclick="startNavigation()" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 flex items-center justify-center">
+                            <i class="fas fa-directions mr-2"></i>
+                            Navigate
+                        </button>
+                        <button onclick="updateRequestStatus()" class="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700">
+                            Mark Arrived
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Map Container -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold">Live Map</h2>
+                        <div class="flex items-center space-x-2">
+                            <div id="location-indicator" class="flex items-center">
+                                <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                                <span class="text-sm text-gray-600">Location Active</span>
+                            </div>
+                            <button onclick="recenterMap()" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                                Recenter
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="map" class="w-full h-96 rounded-lg bg-gray-200">
+                        <!-- Google Maps will load here -->
+                    </div>
+                    
+                    <!-- Map Legend -->
+                    <div class="flex items-center justify-center space-x-6 mt-4 text-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                            <span class="text-gray-600">Your Location</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                            <span class="text-gray-600">Patient Requests</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                            <span class="text-gray-600">Active Request</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nearby Requests -->
+                <div id="nearby-requests" class="bg-white rounded-2xl shadow-lg p-6">
+                    <h2 class="text-lg font-semibold mb-4">Nearby Requests</h2>
+                    
+                    <div id="requests-list" class="space-y-4">
+                        <!-- Dynamic request cards will be inserted here -->
+                    </div>
+                    
+                    <div id="no-requests" class="text-center py-8 text-gray-500">
+                        <i class="fas fa-search text-4xl mb-4"></i>
+                        <p>No requests in your area</p>
+                        <p class="text-sm">Go online to start receiving requests</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="requests" class="space-y-4"></div>
 
+    <!-- Request Popup Modal -->
+    <div id="request-popup" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full mx-4 p-6 animate-bounce-in">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">New Request!</h2>
+                <div id="countdown-timer" class="text-4xl font-bold text-red-600 mb-4">15</div>
+                <p class="text-gray-600">seconds to respond</p>
+            </div>
+            
+            <div class="space-y-4 mb-6">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Service:</span>
+                    <span id="popup-service" class="font-semibold">Blood Pressure Check</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Distance:</span>
+                    <span id="popup-distance" class="font-semibold">1.2 miles</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Estimated Earnings:</span>
+                    <span id="popup-earnings" class="font-semibold text-green-600">$35</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Patient Rating:</span>
+                    <div class="flex items-center">
+                        <span class="text-yellow-500 mr-1">★</span>
+                        <span id="popup-patient-rating" class="font-semibold">4.8</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex space-x-4">
+                <button onclick="declineRequest()" class="flex-1 bg-gray-200 text-gray-700 py-4 rounded-xl font-semibold hover:bg-gray-300 transition-colors">
+                    Decline
+                </button>
+                <button onclick="acceptRequest()" class="flex-1 bg-green-600 text-white py-4 rounded-xl font-semibold hover:bg-green-700 transition-colors">
+                    Accept
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full mx-4 p-6 max-h-screen overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Settings</h2>
+                <button onclick="closeSettings()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Auto-Accept Settings -->
+                <div>
+                    <h3 class="font-semibold mb-3">Request Preferences</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center justify-between">
+                            <span>Auto-accept high-rated patients</span>
+                            <input type="checkbox" id="auto-accept-high-rated" class="toggle-switch">
+                        </label>
+                        <label class="flex items-center justify-between">
+                            <span>Auto-accept urgent requests</span>
+                            <input type="checkbox" id="auto-accept-urgent" class="toggle-switch">
+                        </label>
+                        <div class="flex items-center justify-between">
+                            <span>Maximum distance (miles)</span>
+                            <select id="max-distance" class="border rounded px-3 py-1">
+                                <option value="5">5 miles</option>
+                                <option value="10" selected>10 miles</option>
+                                <option value="15">15 miles</option>
+                                <option value="20">20 miles</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notification Settings -->
+                <div>
+                    <h3 class="font-semibold mb-3">Notifications</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center justify-between">
+                            <span>Request sound alerts</span>
+                            <input type="checkbox" id="sound-alerts" class="toggle-switch" checked>
+                        </label>
+                        <label class="flex items-center justify-between">
+                            <span>Vibration alerts</span>
+                            <input type="checkbox" id="vibration-alerts" class="toggle-switch" checked>
+                        </label>
+                        <label class="flex items-center justify-between">
+                            <span>Earnings notifications</span>
+                            <input type="checkbox" id="earnings-notifications" class="toggle-switch" checked>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Goal Settings -->
+                <div>
+                    <h3 class="font-semibold mb-3">Daily Goal</h3>
+                    <div class="flex items-center space-x-3">
+                        <span>$</span>
+                        <input type="number" id="daily-goal" value="200" min="50" max="500" step="25" 
+                               class="border rounded px-3 py-2 flex-1">
+                        <span>per day</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex space-x-4 mt-8">
+                <button onclick="saveSettings()" class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700">
+                    Save Settings
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Styles -->
+    <style>
+        .toggle-switch {
+            appearance: none;
+            width: 48px;
+            height: 24px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .toggle-switch:checked {
+            background: #10b981;
+        }
+        
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .toggle-switch:checked::before {
+            transform: translateX(24px);
+        }
+        
+        .animate-bounce-in {
+            animation: bounceIn 0.5s ease-out;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .online-button {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-color: #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .online-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+        }
+    </style>
+
+    <!-- JavaScript -->
     <script>
-    const API_BASE_URL = window.API_BASE_URL || 'http://localhost:5001/api';
-    let nurse = null;
-    let token = null;
+        const API_BASE_URL = 'http://localhost:5000/api';
+        let currentUser = JSON.parse(localStorage.getItem('user'));
+        let isOnline = false;
+        let map, nurseMarker, patientMarkers = [];
+        let currentRequest = null;
+        let countdownTimer = null;
+        let locationWatcher = null;
+        let todayEarnings = 0;
+        let todayPatients = 0;
+        let onlineStartTime = null;
 
-    document.addEventListener('DOMContentLoaded', () => {
-        nurse = JSON.parse(localStorage.getItem('user') || '{}');
-        token = localStorage.getItem('token');
-        loadDashboard();
-        setInterval(loadDashboard, 10000);
-    });
-
-    async function loadDashboard() {
-        if (!nurse?.nurse_id) return;
-        try {
-            const res = await fetch(`${API_BASE_URL}/nurses/dashboard?nurse_id=${nurse.nurse_id}`, {
-                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-            });
-            const data = await res.json();
-            if (data.success) {
-                const stats = data.data;
-                document.getElementById('monthly-revenue').textContent = `$${stats.monthly_revenue.toFixed(2)}`;
-                document.getElementById('monthly-jobs').textContent = stats.monthly_jobs;
-                document.getElementById('rating').textContent = stats.average_rating.toFixed(1);
-                updateRequests(stats.new_requests || []);
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initializeMap();
+            await loadNurseData();
+            await loadTodayStats();
+            setupLocationTracking();
+            setupRequestPolling();
+            
+            // Update nurse info in header
+            if (currentUser) {
+                document.getElementById('nurse-name').textContent = 
+                    `${currentUser.first_name} ${currentUser.last_name}`;
+                document.getElementById('nurse-initials').textContent = 
+                    `${currentUser.first_name[0]}${currentUser.last_name[0]}`;
             }
-        } catch (err) {
-            console.error('Dashboard error', err);
-        }
-    }
-
-    function updateRequests(requests) {
-        const container = document.getElementById('requests');
-        container.innerHTML = '';
-        if (requests.length === 0) {
-            container.innerHTML = '<p class="text-gray-500">No new job opportunities.</p>';
-            return;
-        }
-        requests.forEach(req => {
-            const div = document.createElement('div');
-            div.className = 'bg-white rounded-lg shadow p-4';
-            div.innerHTML = `
-                <h3 class="font-semibold text-teal-700 mb-2">${req.service_type}</h3>
-                <p class="text-sm text-gray-600 mb-1">${req.patient_city_state} (~${req.approx_distance_miles} mi)</p>
-                <p class="text-sm text-gray-600 mb-1">Earnings: $${req.estimated_earnings.toFixed(2)}</p>
-                <button class="mt-2 bg-green-600 text-white px-4 py-1 rounded" onclick="alert('Accepting request ${req.request_id}')">Accept</button>
-            `;
-            container.appendChild(div);
         });
-    }
+
+        // Initialize Google Maps
+        async function initializeMap() {
+            const defaultLocation = { lat: 37.7749, lng: -122.4194 };
+            
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 14,
+                center: defaultLocation,
+                styles: [
+                    {
+                        featureType: 'poi',
+                        elementType: 'labels',
+                        stylers: [{ visibility: 'off' }]
+                    }
+                ]
+            });
+
+            // Create nurse marker
+            nurseMarker = new google.maps.Marker({
+                position: defaultLocation,
+                map: map,
+                title: 'Your Location',
+                icon: {
+                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="8" fill="#3b82f6" stroke="white" stroke-width="2"/>
+                            <circle cx="12" cy="12" r="3" fill="white"/>
+                        </svg>
+                    `),
+                    scaledSize: new google.maps.Size(32, 32),
+                    anchor: new google.maps.Point(16, 16)
+                }
+            });
+        }
+
+        // Setup location tracking
+        function setupLocationTracking() {
+            if (navigator.geolocation) {
+                locationWatcher = navigator.geolocation.watchPosition(
+                    updateLocation,
+                    handleLocationError,
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 1000
+                    }
+                );
+            }
+        }
+
+        // Update nurse location
+        async function updateLocation(position) {
+            const { latitude, longitude, accuracy } = position.coords;
+            
+            // Update map marker
+            const newPosition = { lat: latitude, lng: longitude };
+            nurseMarker.setPosition(newPosition);
+            
+            if (isOnline) {
+                // Send location update to server
+                try {
+                    const endpoint = currentRequest 
+                        ? `/tracking/nurse/${currentUser.nurse_id}/precise-location`
+                        : `/tracking/nurse/${currentUser.nurse_id}/general-location`;
+                    
+                    await fetch(`${API_BASE_URL}${endpoint}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({
+                            latitude,
+                            longitude,
+                            accuracy,
+                            speed: position.coords.speed || 0
+                        })
+                    });
+                } catch (error) {
+                    console.error('Error updating location:', error);
+                }
+            }
+        }
+
+        // Toggle online/offline status
+        async function toggleOnlineStatus() {
+            const toggleButton = document.getElementById('toggle-online');
+            const toggleIcon = document.getElementById('toggle-icon');
+            const toggleText = document.getElementById('toggle-text');
+            const statusText = document.getElementById('status-text');
+
+            if (!isOnline) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/nurses/${currentUser.nurse_id}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({
+                            is_online: true,
+                            current_status: 'available'
+                        })
+                    });
+
+                    if (response.ok) {
+                        isOnline = true;
+                        onlineStartTime = new Date();
+                        
+                        toggleButton.className = 'w-32 h-32 rounded-full border-4 online-button border-green-500 flex items-center justify-center transition-all duration-300 hover:scale-105';
+                        toggleIcon.className = 'fas fa-check text-3xl text-white mb-2';
+                        toggleText.textContent = 'ONLINE';
+                        toggleText.className = 'text-sm font-medium text-white';
+                        statusText.textContent = "You're online";
+                        statusText.className = 'text-lg font-medium text-green-600';
+                        
+                        startRequestPolling();
+                        
+                        document.getElementById('location-indicator').innerHTML = `
+                            <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                            <span class="text-sm text-green-600">Online & Available</span>
+                        `;
+                    }
+                } catch (error) {
+                    alert('Failed to go online. Please try again.');
+                }
+            } else {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/nurses/${currentUser.nurse_id}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({
+                            is_online: false,
+                            current_status: 'offline'
+                        })
+                    });
+
+                    if (response.ok) {
+                        isOnline = false;
+                        
+                        toggleButton.className = 'w-32 h-32 rounded-full border-4 bg-gray-100 border-gray-300 flex items-center justify-center transition-all duration-300 hover:scale-105';
+                        toggleIcon.className = 'fas fa-power-off text-3xl text-gray-500 mb-2';
+                        toggleText.textContent = 'GO ONLINE';
+                        toggleText.className = 'text-sm font-medium text-gray-600';
+                        statusText.textContent = "You're offline";
+                        statusText.className = 'text-lg font-medium text-gray-600';
+                        
+                        stopRequestPolling();
+                        
+                        if (onlineStartTime) {
+                            const hoursWorked = (new Date() - onlineStartTime) / (1000 * 60 * 60);
+                            updateHoursOnline(hoursWorked);
+                        }
+                        
+                        document.getElementById('location-indicator').innerHTML = `
+                            <div class="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
+                            <span class="text-sm text-gray-600">Offline</span>
+                        `;
+                    }
+                } catch (error) {
+                    alert('Failed to go offline. Please try again.');
+                }
+            }
+        }
+
+        let requestPollingInterval;
+        function startRequestPolling() {
+            requestPollingInterval = setInterval(checkForNewRequests, 5000);
+            checkForNewRequests();
+        }
+        function stopRequestPolling() {
+            if (requestPollingInterval) {
+                clearInterval(requestPollingInterval);
+                requestPollingInterval = null;
+            }
+        }
+        async function checkForNewRequests() {
+            if (!isOnline || currentRequest) return;
+            try {
+                const response = await fetch(`${API_BASE_URL}/requests/pending-for-nurse/${currentUser.nurse_id}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                const data = await response.json();
+                if (data.success && data.requests.length > 0) {
+                    showRequestPopup(data.requests[0]);
+                }
+                updateNearbyRequestsDisplay(data.requests);
+            } catch (error) {
+                console.error('Error checking for requests:', error);
+            }
+        }
+
+        function showRequestPopup(request) {
+            const popup = document.getElementById('request-popup');
+            document.getElementById('popup-service').textContent = 
+                request.service_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            document.getElementById('popup-distance').textContent = `${request.distance_miles} miles`;
+            document.getElementById('popup-earnings').textContent = `$${request.nurse_earnings}`;
+            document.getElementById('popup-patient-rating').textContent = request.patient_rating || '4.5';
+            window.currentPendingRequest = request;
+            popup.classList.remove('hidden');
+            let timeLeft = 15;
+            const countdownElement = document.getElementById('countdown-timer');
+            countdownTimer = setInterval(() => {
+                timeLeft--;
+                countdownElement.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    popup.classList.add('hidden');
+                    window.currentPendingRequest = null;
+                }
+            }, 1000);
+            if (document.getElementById('sound-alerts').checked) {
+                playAlertSound();
+            }
+            if (document.getElementById('vibration-alerts').checked && navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]);
+            }
+        }
+
+        async function acceptRequest() {
+            if (!window.currentPendingRequest) return;
+            try {
+                const response = await fetch(`${API_BASE_URL}/requests/${window.currentPendingRequest.request_id}/accept`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ nurse_id: currentUser.nurse_id })
+                });
+                if (response.ok) {
+                    clearInterval(countdownTimer);
+                    document.getElementById('request-popup').classList.add('hidden');
+                    currentRequest = window.currentPendingRequest;
+                    window.currentPendingRequest = null;
+                    await fetch(`${API_BASE_URL}/tracking/nurse/${currentUser.nurse_id}/start-tracking/${currentRequest.request_id}`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    });
+                    showActiveRequestCard();
+                    updateNurseStatus('busy');
+                    addPatientMarker(currentRequest);
+                } else {
+                    alert('Failed to accept request. It may have been taken by another nurse.');
+                }
+            } catch (error) {
+                alert('Error accepting request. Please try again.');
+            }
+        }
+
+        function declineRequest() {
+            clearInterval(countdownTimer);
+            document.getElementById('request-popup').classList.add('hidden');
+            window.currentPendingRequest = null;
+        }
+
+        function showActiveRequestCard() {
+            if (!currentRequest) return;
+            const card = document.getElementById('active-request-card');
+            document.getElementById('patient-name').textContent = 
+                `${currentRequest.patient_id.first_name} ${currentRequest.patient_id.last_name}`;
+            document.getElementById('request-service').textContent = 
+                currentRequest.service_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            document.getElementById('request-urgency').textContent = 
+                currentRequest.urgency === 'urgent' ? 'Urgent' : 'Normal';
+            document.getElementById('request-payment').textContent = `$${currentRequest.nurse_earnings}`;
+            document.getElementById('request-distance').textContent = `${currentRequest.distance_miles} miles`;
+            document.getElementById('request-address').textContent = currentRequest.patient_address.street;
+            updateETA();
+            card.classList.remove('hidden');
+        }
+
+        function updateETA() {
+            if (!currentRequest) return;
+            const eta = Math.round(currentRequest.distance_miles * 3 + 5);
+            document.getElementById('request-eta').textContent = `${eta} minutes`;
+        }
+
+        function addPatientMarker(request) {
+            const patientLocation = {
+                lat: request.patient_location.coordinates[1],
+                lng: request.patient_location.coordinates[0]
+            };
+            const patientMarker = new google.maps.Marker({
+                position: patientLocation,
+                map: map,
+                title: 'Patient Location',
+                icon: {
+                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L13.09 8.26L19 9L13.09 9.74L12 16L10.91 9.74L5 9L10.91 8.26L12 2Z" fill="#ef4444"/>
+                            <circle cx="12" cy="12" r="6" fill="#ef4444" stroke="white" stroke-width="2"/>
+                        </svg>
+                    `),
+                    scaledSize: new google.maps.Size(32, 32),
+                    anchor: new google.maps.Point(16, 16)
+                }
+            });
+            patientMarkers.push(patientMarker);
+            const bounds = new google.maps.LatLngBounds();
+            bounds.extend(nurseMarker.getPosition());
+            bounds.extend(patientLocation);
+            map.fitBounds(bounds);
+        }
+
+        function callPatient() {
+            if (currentRequest && currentRequest.patient_id.phone) {
+                window.open(`tel:${currentRequest.patient_id.phone}`);
+            }
+        }
+
+        function startNavigation() {
+            if (currentRequest) {
+                const destination = `${currentRequest.patient_location.coordinates[1]},${currentRequest.patient_location.coordinates[0]}`;
+                const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
+                window.open(googleMapsUrl, '_blank');
+            }
+        }
+
+        async function updateRequestStatus() {
+            if (!currentRequest) return;
+            const currentStatus = currentRequest.status;
+            let newStatus;
+            switch (currentStatus) {
+                case 'accepted':
+                    newStatus = 'en_route';
+                    break;
+                case 'en_route':
+                    newStatus = 'arrived';
+                    break;
+                case 'arrived':
+                    newStatus = 'in_progress';
+                    break;
+                case 'in_progress':
+                    newStatus = 'completed';
+                    break;
+                default:
+                    return;
+            }
+            try {
+                const response = await fetch(`${API_BASE_URL}/requests/${currentRequest.request_id}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (response.ok) {
+                    currentRequest.status = newStatus;
+                    updateRequestStatusUI(newStatus);
+                    if (newStatus === 'completed') {
+                        todayEarnings += currentRequest.nurse_earnings;
+                        todayPatients += 1;
+                        updateTodayStats();
+                        await fetch(`${API_BASE_URL}/tracking/nurse/${currentUser.nurse_id}/stop-tracking`, {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                        });
+                        currentRequest = null;
+                        document.getElementById('active-request-card').classList.add('hidden');
+                        updateNurseStatus('available');
+                        patientMarkers.forEach(marker => marker.setMap(null));
+                        patientMarkers = [];
+                        alert(`Service completed! You earned $${currentRequest.nurse_earnings}`);
+                    }
+                }
+            } catch (error) {
+                alert('Error updating request status');
+            }
+        }
+
+        function updateRequestStatusUI(status) {
+            const statusElement = document.getElementById('request-status');
+            const buttonElement = document.querySelector('#active-request-card button[onclick="updateRequestStatus()"]');
+            const statusMap = {
+                'accepted': { text: 'Accepted', button: 'En Route' },
+                'en_route': { text: 'En Route', button: 'Mark Arrived' },
+                'arrived': { text: 'Arrived', button: 'Start Service' },
+                'in_progress': { text: 'In Progress', button: 'Complete Service' }
+            };
+            if (statusMap[status]) {
+                statusElement.textContent = statusMap[status].text;
+                buttonElement.textContent = statusMap[status].button;
+            }
+        }
+
+        async function loadTodayStats() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/nurses/${currentUser.nurse_id}/stats/today`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    todayEarnings = data.earnings || 0;
+                    todayPatients = data.patients || 0;
+                    updateTodayStats();
+                }
+            } catch (error) {
+                console.error('Error loading today stats:', error);
+            }
+        }
+
+        function updateTodayStats() {
+            document.getElementById('today-earnings').textContent = `$${todayEarnings}`;
+            document.getElementById('today-patients').textContent = todayPatients;
+            const dailyGoal = parseInt(document.getElementById('daily-goal').value);
+            const progress = Math.min((todayEarnings / dailyGoal) * 100, 100);
+            document.getElementById('goal-progress').textContent = `$${todayEarnings} / $${dailyGoal}`;
+            document.getElementById('goal-progress-bar').style.width = `${progress}%`;
+        }
+
+        function updateHoursOnline(additionalHours = 0) {
+            let totalMinutes = additionalHours * 60;
+            if (onlineStartTime) {
+                totalMinutes += (new Date() - onlineStartTime) / (1000 * 60);
+            }
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = Math.floor(totalMinutes % 60);
+            document.getElementById('hours-online').textContent = `${hours}h ${minutes}m`;
+        }
+        setInterval(() => {
+            if (isOnline) {
+                updateHoursOnline();
+            }
+        }, 60000);
+
+        async function loadNurseData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/nurses/${currentUser.nurse_id}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const nurse = data.nurse;
+                    document.getElementById('nurse-rating').textContent = nurse.average_rating.toFixed(1);
+                    document.getElementById('acceptance-rate').textContent = `${nurse.acceptance_rate || 95}%`;
+                    document.getElementById('completion-rate').textContent = `${nurse.completion_rate || 98}%`;
+                    document.getElementById('response-time').textContent = `${nurse.response_time_avg || 12}s avg`;
+                }
+            } catch (error) {
+                console.error('Error loading nurse data:', error);
+            }
+        }
+
+        function openSettings() {
+            document.getElementById('settings-modal').classList.remove('hidden');
+        }
+        function closeSettings() {
+            document.getElementById('settings-modal').classList.add('hidden');
+        }
+        function saveSettings() {
+            const settings = {
+                autoAcceptHighRated: document.getElementById('auto-accept-high-rated').checked,
+                autoAcceptUrgent: document.getElementById('auto-accept-urgent').checked,
+                maxDistance: document.getElementById('max-distance').value,
+                soundAlerts: document.getElementById('sound-alerts').checked,
+                vibrationAlerts: document.getElementById('vibration-alerts').checked,
+                earningsNotifications: document.getElementById('earnings-notifications').checked,
+                dailyGoal: document.getElementById('daily-goal').value
+            };
+            localStorage.setItem('nurseSettings', JSON.stringify(settings));
+            closeSettings();
+            alert('Settings saved successfully!');
+        }
+
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('nurseSettings') || '{}');
+            if (settings.autoAcceptHighRated) document.getElementById('auto-accept-high-rated').checked = true;
+            if (settings.autoAcceptUrgent) document.getElementById('auto-accept-urgent').checked = true;
+            if (settings.maxDistance) document.getElementById('max-distance').value = settings.maxDistance;
+            if (settings.soundAlerts !== undefined) document.getElementById('sound-alerts').checked = settings.soundAlerts;
+            if (settings.vibrationAlerts !== undefined) document.getElementById('vibration-alerts').checked = settings.vibrationAlerts;
+            if (settings.earningsNotifications !== undefined) document.getElementById('earnings-notifications').checked = settings.earningsNotifications;
+            if (settings.dailyGoal) document.getElementById('daily-goal').value = settings.dailyGoal;
+        }
+
+        function recenterMap() {
+            if (nurseMarker) {
+                map.setCenter(nurseMarker.getPosition());
+                map.setZoom(14);
+            }
+        }
+        function playAlertSound() {
+            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjaN0O/FeiwFKHrJ8N2QQAoUXrTp66hVFApGn+DyvmwhBjaN0O/FeiwFKHrJ8N2QQAoUXrTp66hVFApGn+DyvmzhBjaN0O/FeiwFKHrJ8N2QQAoUXrTp66hVFApGn+DyvmshBjaN0O/FeiwFKHrJ8N2QQAoUXrTp66hVFApGn+DyvmshBjaN0O/FeiwFKHrJ8N2QQAoUXrTp66hVFApGn+DyvmshBjaN0O/FeiwFKHrJ8N2QQAoUXrTp66hVFApGn+DyvmshBjaN0O/FeiwFKHrJ8N2QQAoUXrTp66hVFApGn+DyvmshBjaN0O/FeiwFKHrJ8N2QQAoUXrTp66hVFApGn+DyvmshBjaN0O/FeiwFKHrJ8N2QQAoUXrTp66hVFApGn+DyvmshBjaN0O/FeiwFKHrJ8N2QQAoUXrTp66hVFApGn+DyvmshBjaN0O/FeiwFKHrJ8N2QQAoUXrTp66hVFApGn+DyvmshBjaN0O/FeiwFKHrJ8N2QQAoUXrTp66hVFApGn+Dyvmsh');
+            audio.play().catch(e => console.log('Could not play alert sound'));
+        }
+        function handleLocationError(error) {
+            console.error('Location error:', error);
+            document.getElementById('location-indicator').innerHTML = `
+                <div class="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                <span class="text-sm text-red-600">Location Error</span>
+            `;
+        }
+
+        function viewHistory() { window.location.href = 'nurse-history.html'; }
+        function viewEarnings() { window.location.href = 'nurse-earnings.html'; }
+        function updateProfile() { window.location.href = 'nurse-profile.html'; }
+        function getSupport() { window.location.href = 'nurse-support.html'; }
+        document.addEventListener('DOMContentLoaded', loadSettings);
     </script>
 </body>
 </html>
