@@ -95,6 +95,30 @@ Your frontend is built using Vite.
 *   Access the frontend URL (e.g., `http://localhost:5173`) in your browser.
 *   You should be able to register, log in, and use the application features.
 
+## Building a Windows EXE with Electron
+
+This repository now includes a minimal Electron wrapper so the React app can be
+packaged as a desktop executable:
+
+1.  Install dependencies (if you haven't already):
+    ```bash
+    npm install
+    ```
+2.  Build the frontend so Electron can load the static files:
+    ```bash
+    npm run build
+    ```
+3.  Launch the desktop version in development:
+    ```bash
+    npm run electron-dev
+    ```
+    This opens an Electron window loading `http://localhost:5173`.
+4.  To create a Windows `.exe`:
+    ```bash
+    npm run package-win
+    ```
+    The generated executable will be placed in the `dist-electron/` folder.
+
 ## Troubleshooting
 
 *   **`sh: vite: command not found` (Frontend):** Make sure you have run `npm install` in your frontend project directory.
