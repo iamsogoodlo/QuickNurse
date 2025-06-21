@@ -33,7 +33,12 @@ view monthly revenue, jobs taken, and ratings directly on their dashboard.
     ```
 
 2.  **Create `.env` File:**
-    In the `quicknurse-api` root, create a `.env` file with the following content, replacing placeholders with your actual credentials:
+    A sample environment file is included as `quicknurse-api/.env.example`.
+    Copy it and replace the placeholders with your actual credentials:
+    ```bash
+    cp quicknurse-api/.env.example quicknurse-api/.env
+    ```
+    Edit `.env` so it contains something like:
     ```env
     MONGODB_URI=mongodb+srv://your_username:your_password@your_cluster.mongodb.net/quicknurse?retryWrites=true&w=majority
     JWT_SECRET=YOUR_VERY_STRONG_JWT_SECRET_KEY_GOES_HERE
@@ -71,11 +76,12 @@ Your frontend is built using Vite.
     ```
 
 3.  **Configure API Base URL (if not already done):**
-    The frontend can read a `VITE_API_BASE_URL` environment variable at build time. Create a `.env` file if needed:
+    A sample `.env.example` is provided in the project root. Copy it then edit if your API is not running on `http://localhost:5000`:
     ```bash
-    VITE_API_BASE_URL="https://your-api.example.com/api"
+    cp .env.example .env
+    # then edit .env and set VITE_API_BASE_URL="https://your-api.example.com/api"
     ```
-    If no variable is provided, the app falls back to `http://localhost:5000/api` for local development.
+    If no `.env` file is provided, the app falls back to `http://localhost:5000/api` for local development.
 
 4.  **Run the Frontend Development Server:**
     ```bash

@@ -5,7 +5,8 @@ yarn-debug.log*
 yarn-error.log*
 *.env
 .env.*
-!/.env.example # If you have an example env file, you can include it
+!/.env.example
+!api/.env.example
 
 # Backend specific (inside 'api' folder)
 api/node_modules/
