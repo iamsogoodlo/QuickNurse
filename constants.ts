@@ -8,7 +8,7 @@ export const API_BASE_URL =
   (typeof import.meta !== 'undefined' &&
     (import.meta as any).env &&
     (import.meta as any).env.VITE_API_BASE_URL) ||
-  'http://localhost:5000/api';
+  'http://localhost:5001/api';
 
 export const AUTH_ENDPOINTS = {
   NURSE_REGISTER: API_BASE_URL + '/auth/nurse/register',

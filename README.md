@@ -42,7 +42,7 @@ view monthly revenue, jobs taken, and ratings directly on their dashboard.
     ```env
     MONGODB_URI=mongodb+srv://your_username:your_password@your_cluster.mongodb.net/quicknurse?retryWrites=true&w=majority
     JWT_SECRET=YOUR_VERY_STRONG_JWT_SECRET_KEY_GOES_HERE
-    PORT=5000
+    PORT=5001
     NODE_ENV=development
     ```
     *   Ensure your MongoDB Atlas IP whitelist allows connections from your IP address.
@@ -57,7 +57,7 @@ view monthly revenue, jobs taken, and ratings directly on their dashboard.
     ```bash
     npm run dev
     ```
-    The API server should start, typically on `http://localhost:5000`. Look for console messages indicating a successful database connection and server startup. Keep this terminal window open.
+    The API server should start, typically on `http://localhost:5001`. Look for console messages indicating a successful database connection and server startup. Keep this terminal window open.
 
 ## Frontend Setup (`quicknurse-frontend` or your frontend root)
 
@@ -76,12 +76,12 @@ Your frontend is built using Vite.
     ```
 
 3.  **Configure API Base URL (if not already done):**
-    A sample `.env.example` is provided in the project root. Copy it then edit if your API is not running on `http://localhost:5000`:
+    A sample `.env.example` is provided in the project root. Copy it then edit if your API is not running on `http://localhost:5001`:
     ```bash
     cp .env.example .env
     # then edit .env and set VITE_API_BASE_URL="https://your-api.example.com/api"
     ```
-    If no `.env` file is provided, the app falls back to `http://localhost:5000/api` for local development.
+    If no `.env` file is provided, the app falls back to `http://localhost:5001/api` for local development.
 
 4.  **Run the Frontend Development Server:**
     ```bash
