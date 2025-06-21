@@ -6,7 +6,8 @@ import { updateNurseStatus, getNurseProfile, getNurseDashboard } from '../servic
 import Select from '../components/common/Select';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { NURSE_STATUS_OPTIONS } from '../constants';
-import ServiceRequestCardNurseView from '../components/dashboard/nurse/ServiceRequestCardNurseView'; // New component
+import ServiceRequestCardNurseView from '../components/dashboard/nurse/ServiceRequestCardNurseView';
+import NurseMap from '../components/dashboard/nurse/NurseMap';
 import { PowerIcon, UserCircleIcon, ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
 
 
@@ -256,8 +257,8 @@ const NurseDashboardPage: React.FC = () => {
                 {isOnline && incomingRequests.length > 0 && (
                     <div className="space-y-4">
                         {incomingRequests.map(request => (
-                            <ServiceRequestCardNurseView 
-                                key={request.request_id} 
+                            <ServiceRequestCardNurseView
+                                key={request.request_id}
                                 request={request}
                                 onAccept={() => handleRequestAction(request.request_id, 'accept')}
                                 onDecline={() => handleRequestAction(request.request_id, 'decline')}
@@ -265,6 +266,12 @@ const NurseDashboardPage: React.FC = () => {
                         ))}
                     </div>
                 )}
+            </div>
+
+            {/* Simple Map Display */}
+            <div className="mt-6">
+                <h2 className="text-xl font-semibold text-gray-700 mb-2">Your Location</h2>
+                <NurseMap />
             </div>
         </div>
       </div>
