@@ -100,5 +100,6 @@ Your frontend is built using Vite.
     *   Double-check your `MONGODB_URI` in the backend `.env` file.
     *   Verify your internet connection.
     *   Ensure your IP is whitelisted in MongoDB Atlas.
+    *   If `npm install` fails with ETARGET errors for multer, ensure your `api/package.json` uses `multer` version `^1.4.5-lts.2`.
 
 This README should help you and others get the project running smoothly.
