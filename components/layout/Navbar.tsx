@@ -23,7 +23,12 @@ const Navbar: React.FC = () => {
           {isAuthenticated ? (
             <>
               {userType === 'patient' && <Link to="/patient/dashboard" className="text-gray-700 hover:text-teal-600">Patient Dashboard</Link>}
-              {userType === 'nurse' && <Link to="/nurse/dashboard" className="text-gray-700 hover:text-teal-600">Nurse Dashboard</Link>}
+              {userType === 'nurse' && (
+                <>
+                  <Link to="/nurse/dashboard" className="text-gray-700 hover:text-teal-600">Nurse Dashboard</Link>
+                  <Link to="/nurse/settings" className="text-gray-700 hover:text-teal-600 ml-4">Personal Settings</Link>
+                </>
+              )}
               <span className="text-gray-600 text-sm">Hi, {user?.first_name}</span>
               <button
                 onClick={handleLogout}

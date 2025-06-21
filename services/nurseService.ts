@@ -40,6 +40,13 @@ export const getNurseProfile = async (token: string): Promise<ApiResponse<NurseP
     return apiService<NurseProfile>(NURSE_ENDPOINTS.PROFILE, 'GET', undefined, token);
 };
 
+export const updateNurseProfile = async (
+  profileData: Partial<NurseProfile>,
+  token: string
+): Promise<ApiResponse<NurseProfile>> => {
+  return apiService<NurseProfile>(NURSE_ENDPOINTS.PROFILE, 'PUT', profileData, token);
+};
+
 export const getNurseDashboard = async (
   nurseId: string,
   token?: string
