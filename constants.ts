@@ -15,6 +15,7 @@ export const NURSE_ENDPOINTS = {
   NEARBY: API_BASE_URL + '/nurses/nearby',
   UPDATE_STATUS: API_BASE_URL + '/nurses/status', // Assumed endpoint
   PROFILE: API_BASE_URL + '/nurses/profile', // Assumed endpoint
+  DASHBOARD: API_BASE_URL + '/nurses/dashboard', // Stats and new jobs
 };
 
 export const PATIENT_ENDPOINTS = {

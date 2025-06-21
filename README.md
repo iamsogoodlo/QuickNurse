@@ -13,6 +13,12 @@ QuickNurse_Main_Directory/
 └── quicknurse-api/       (Contains server.js, models/, routes/, package.json for backend)
 ```
 
+## Recent Enhancements
+
+The platform now supports real-time nurse location tracking, photo-based document
+verification, and fixed pricing with distance and time surcharges. Nurses can
+view monthly revenue, jobs taken, and ratings directly on their dashboard.
+
 ## Prerequisites
 
 *   Node.js (v18 or later recommended) and npm
