@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { NearbyNurse, NurseSpecialty } from '../../../types';
+import { NearbyNurse } from '../../../types';
 import Button from '../../common/Button';
 
 interface NurseCardProps {

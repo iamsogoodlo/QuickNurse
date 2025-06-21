@@ -3,7 +3,6 @@ import React, { useState, useEffect, ChangeEvent } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { NurseProfile, NurseStatus, ApiError, ServiceRequestSummaryForNurse, NurseDashboardStats } from '../types';
 import { updateNurseStatus, getNurseProfile, getNurseDashboard } from '../services/nurseService';
-import Button from '../components/common/Button';
 import Select from '../components/common/Select';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { NURSE_STATUS_OPTIONS } from '../constants';
@@ -11,29 +10,6 @@ import ServiceRequestCardNurseView from '../components/dashboard/nurse/ServiceRe
 import { PowerIcon, UserCircleIcon, ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
 
 
-// Mock data for incoming service requests
-const mockRequests: ServiceRequestSummaryForNurse[] = [
-  {
-    request_id: 'req_1',
-    patient_display_name: 'Patient A.B.',
-    service_type: 'Wound Care',
-    approx_distance_miles: 2.5,
-    patient_city_state: 'Anytown, ST',
-    estimated_earnings: 45,
-    requested_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(), // 5 minutes ago
-    status: 'pending',
-  },
-  {
-    request_id: 'req_2',
-    patient_display_name: 'Patient C.D.',
-    service_type: 'IV Therapy',
-    approx_distance_miles: 5.1,
-    patient_city_state: 'Otherville, ST',
-    estimated_earnings: 70,
-    requested_at: new Date(Date.now() - 1000 * 60 * 12).toISOString(), // 12 minutes ago
-    status: 'pending',
-  },
-];
 
 
 const NurseDashboardPage: React.FC = () => {
