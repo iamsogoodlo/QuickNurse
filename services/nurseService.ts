@@ -1,7 +1,7 @@
 
 import { apiService } from './api';
 import { NURSE_ENDPOINTS } from '../constants';
-import { ApiResponse, NearbyNurse, NurseProfile, NurseStatus } from '../types';
+import { ApiResponse, NearbyNurse, NurseProfile, NurseStatus, NurseDashboardStats } from '../types';
 
 export const findNearbyNurses = async (
   lat: number, 

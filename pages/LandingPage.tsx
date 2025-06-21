@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../components/common/Button';
-import { ClockIcon, CheckBadgeIcon, BanknotesIcon, UserPlusIcon, MagnifyingGlassIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'; // Using Heroicons
+import { ClockIcon, BanknotesIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'; // Using Heroicons
 
 const LandingPage: React.FC = () => {
   // Main page icon - can be a more specific medical icon if available or custom SVG
