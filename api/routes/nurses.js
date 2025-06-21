@@ -1,5 +1,6 @@
 const express = require('express');
 const Nurse = require('../models/Nurse');
+const ServiceRequest = require('../models/ServiceRequest');
 const router = express.Router();
 // const authMiddleware = require('../middleware/auth'); // Placeholder for JWT auth middleware
 
@@ -91,8 +92,8 @@ router.get('/nearby', async (req, res) => {
     const radiusInMeters = searchRadiusMiles * 1609.34;
 
     const query = {
-      location: {
-        $nearSphere: { // Use $nearSphere for more accurate spherical queries
+      general_location: {
+        $nearSphere: {
           $geometry: {
             type: 'Point',
             coordinates: [patientLng, patientLat]
@@ -129,35 +130,36 @@ router.get('/nearby', async (req, res) => {
     const currentHour = new Date().getHours();
 
     const nursesWithPricing = nurses
-      .filter(nurse => nurse.location && nurse.location.coordinates && nurse.location.coordinates.length === 2) // Ensure nurse has valid coordinates
+      .filter(nurse => nurse.general_location && Array.isArray(nurse.general_location.coordinates) && nurse.general_location.coordinates.length === 2)
       .map(nurse => {
         const distance = calculateDistance(
-          patientLat, patientLng,
-          nurse.location.coordinates[1], nurse.location.coordinates[0] // Nurse coords are [lng, lat]
+          patientLat,
+          patientLng,
+          nurse.general_location.coordinates[1],
+          nurse.general_location.coordinates[0]
         );
 
-        if (distance > nurse.availability_radius) { // Check if patient is within nurse's preferred radius
-            return null; // Skip this nurse if too far based on their preference
-        }
-
         const pricing = calculateServicePrice(
-          basePrice, nurse, distance, 'normal', currentHour // Assuming 'normal' urgency for search results
+          basePrice,
+          nurse,
+          distance,
+          'normal',
+          currentHour
         );
 
         return {
           nurse_id: nurse.nurse_id,
           first_name: nurse.first_name,
           last_name: nurse.last_name,
-          email: nurse.email, // Added as per frontend type
+          email: nurse.email,
           specialties: nurse.specialties,
           years_experience: nurse.years_experience,
           average_rating: nurse.average_rating,
-          hourly_rate: nurse.hourly_rate, // Base rate, not necessarily the final price
-          location: nurse.location, 
+          general_location: nurse.general_location,
           pricing,
           distance: parseFloat(distance.toFixed(1))
         };
-    }).filter(nurse => nurse !== null); // Remove null entries (nurses filtered out by radius)
+    });
 
 
     res.json({ success: true, data: nursesWithPricing });
@@ -244,6 +246,62 @@ router.get('/profile', /* authMiddleware, */ async (req, res) => {
         console.error("Error fetching nurse profile:", error);
         res.status(500).json({ success: false, error: error.message || 'Server error fetching nurse profile.' });
     }
+});
+
+// GET /api/nurses/dashboard - stats and new job opportunities
+router.get('/dashboard', async (req, res) => {
+  try {
+    const { nurse_id } = req.query;
+    if (!nurse_id) {
+      return res.status(400).json({ success: false, error: 'nurse_id is required' });
+    }
+
+    const nurse = await Nurse.findOne({ nurse_id }).select('average_rating');
+    if (!nurse) {
+      return res.status(404).json({ success: false, error: 'Nurse not found' });
+    }
+
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0,0,0,0);
+
+    const completed = await ServiceRequest.find({
+      nurse_id,
+      status: 'completed',
+      service_completed_at: { $gte: startOfMonth }
+    }).select('nurse_earnings');
+
+    const monthlyRevenue = completed.reduce((sum, r) => sum + (r.nurse_earnings || 0), 0);
+    const monthlyJobs = completed.length;
+
+    const pendingRequests = await ServiceRequest.find({ status: 'pending' })
+      .sort({ requested_at: -1 })
+      .limit(5);
+
+    const newRequests = pendingRequests.map(r => ({
+      request_id: r.request_id,
+      patient_display_name: 'Patient',
+      service_type: r.service_type.replace(/_/g, ' '),
+      approx_distance_miles: r.nurse_distance || 0,
+      patient_city_state: r.patient_address ? `${r.patient_address.city}, ${r.patient_address.state}` : '',
+      estimated_earnings: r.nurse_earnings || 0,
+      requested_at: r.requested_at.toISOString(),
+      status: 'pending'
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        monthly_revenue: monthlyRevenue,
+        monthly_jobs: monthlyJobs,
+        average_rating: nurse.average_rating || 0,
+        new_requests: newRequests
+      }
+    });
+  } catch (error) {
+    console.error('Dashboard error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 

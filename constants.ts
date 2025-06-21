@@ -1,8 +1,14 @@
 
 import { LicenseType, NurseSpecialty, NurseCertification, NurseStatus } from './types';
 
-// MODIFIED for local development: Points to your backend server
-export const API_BASE_URL = 'http://localhost:5001/api'; 
+// Base URL for the backend API.
+// `VITE_API_BASE_URL` can be provided at build time to override the default.
+// Fallback to localhost for local development.
+export const API_BASE_URL =
+  (typeof import.meta !== 'undefined' &&
+    (import.meta as any).env &&
+    (import.meta as any).env.VITE_API_BASE_URL) ||
+  'http://localhost:5000/api';
 
 export const AUTH_ENDPOINTS = {
   NURSE_REGISTER: API_BASE_URL + '/auth/nurse/register',
@@ -15,6 +21,7 @@ export const NURSE_ENDPOINTS = {
   NEARBY: API_BASE_URL + '/nurses/nearby',
   UPDATE_STATUS: API_BASE_URL + '/nurses/status', // Assumed endpoint
   PROFILE: API_BASE_URL + '/nurses/profile', // Assumed endpoint
+  DASHBOARD: API_BASE_URL + '/nurses/dashboard', // Stats and new jobs
 };
 
 export const PATIENT_ENDPOINTS = {

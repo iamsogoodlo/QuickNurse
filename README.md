@@ -13,6 +13,12 @@ QuickNurse_Main_Directory/
 └── quicknurse-api/       (Contains server.js, models/, routes/, package.json for backend)
 ```
 
+## Recent Enhancements
+
+The platform now supports real-time nurse location tracking, photo-based document
+verification, and fixed pricing with distance and time surcharges. Nurses can
+view monthly revenue, jobs taken, and ratings directly on their dashboard.
+
 ## Prerequisites
 
 *   Node.js (v18 or later recommended) and npm
@@ -65,10 +71,11 @@ Your frontend is built using Vite.
     ```
 
 3.  **Configure API Base URL (if not already done):**
-    Ensure your frontend's `src/constants.ts` (or equivalent) has the `API_BASE_URL` pointing to your running backend:
-    ```typescript
-    export const API_BASE_URL = 'http://localhost:5000/api';
+    The frontend can read a `VITE_API_BASE_URL` environment variable at build time. Create a `.env` file if needed:
+    ```bash
+    VITE_API_BASE_URL="https://your-api.example.com/api"
     ```
+    If no variable is provided, the app falls back to `http://localhost:5000/api` for local development.
 
 4.  **Run the Frontend Development Server:**
     ```bash
@@ -94,5 +101,9 @@ Your frontend is built using Vite.
     *   Double-check your `MONGODB_URI` in the backend `.env` file.
     *   Verify your internet connection.
     *   Ensure your IP is whitelisted in MongoDB Atlas.
+    *   If `npm install` fails with ETARGET errors for multer, ensure your `api/package.json` uses `multer` version `^1.4.5-lts.2`.
 
 This README should help you and others get the project running smoothly.
+
+## Nurse Dashboard Prototype
+A prototype HTML dashboard is available in `nurse-dashboard.html` with placeholders for real-time features.
