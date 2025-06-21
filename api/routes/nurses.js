@@ -91,8 +91,8 @@ router.get('/nearby', async (req, res) => {
     const radiusInMeters = searchRadiusMiles * 1609.34;
 
     const query = {
-      location: {
-        $nearSphere: { // Use $nearSphere for more accurate spherical queries
+      general_location: {
+        $nearSphere: {
           $geometry: {
             type: 'Point',
             coordinates: [patientLng, patientLat]
@@ -129,35 +129,36 @@ router.get('/nearby', async (req, res) => {
     const currentHour = new Date().getHours();
 
     const nursesWithPricing = nurses
-      .filter(nurse => nurse.location && nurse.location.coordinates && nurse.location.coordinates.length === 2) // Ensure nurse has valid coordinates
+      .filter(nurse => nurse.general_location && Array.isArray(nurse.general_location.coordinates) && nurse.general_location.coordinates.length === 2)
       .map(nurse => {
         const distance = calculateDistance(
-          patientLat, patientLng,
-          nurse.location.coordinates[1], nurse.location.coordinates[0] // Nurse coords are [lng, lat]
+          patientLat,
+          patientLng,
+          nurse.general_location.coordinates[1],
+          nurse.general_location.coordinates[0]
         );
 
-        if (distance > nurse.availability_radius) { // Check if patient is within nurse's preferred radius
-            return null; // Skip this nurse if too far based on their preference
-        }
-
         const pricing = calculateServicePrice(
-          basePrice, nurse, distance, 'normal', currentHour // Assuming 'normal' urgency for search results
+          basePrice,
+          nurse,
+          distance,
+          'normal',
+          currentHour
         );
 
         return {
           nurse_id: nurse.nurse_id,
           first_name: nurse.first_name,
           last_name: nurse.last_name,
-          email: nurse.email, // Added as per frontend type
+          email: nurse.email,
           specialties: nurse.specialties,
           years_experience: nurse.years_experience,
           average_rating: nurse.average_rating,
-          hourly_rate: nurse.hourly_rate, // Base rate, not necessarily the final price
-          location: nurse.location, 
+          general_location: nurse.general_location,
           pricing,
           distance: parseFloat(distance.toFixed(1))
         };
-    }).filter(nurse => nurse !== null); // Remove null entries (nurses filtered out by radius)
+    });
 
 
     res.json({ success: true, data: nursesWithPricing });
