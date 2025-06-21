@@ -13,6 +13,12 @@ QuickNurse_Main_Directory/
 └── quicknurse-api/       (Contains server.js, models/, routes/, package.json for backend)
 ```
 
+## Recent Enhancements
+
+The platform now supports real-time nurse location tracking, photo-based document
+verification, and fixed pricing with distance and time surcharges. Nurses can
+view monthly revenue, jobs taken, and ratings directly on their dashboard.
+
 ## Prerequisites
 
 *   Node.js (v18 or later recommended) and npm
@@ -27,11 +33,16 @@ QuickNurse_Main_Directory/
     ```
 
 2.  **Create `.env` File:**
-    In the `quicknurse-api` root, create a `.env` file with the following content, replacing placeholders with your actual credentials:
+    A sample environment file is included as `quicknurse-api/.env.example`.
+    Copy it and replace the placeholders with your actual credentials:
+    ```bash
+    cp quicknurse-api/.env.example quicknurse-api/.env
+    ```
+    Edit `.env` so it contains something like:
     ```env
     MONGODB_URI=mongodb+srv://your_username:your_password@your_cluster.mongodb.net/quicknurse?retryWrites=true&w=majority
     JWT_SECRET=YOUR_VERY_STRONG_JWT_SECRET_KEY_GOES_HERE
-    PORT=5000
+    PORT=5001
     NODE_ENV=development
     ```
     *   Ensure your MongoDB Atlas IP whitelist allows connections from your IP address.
@@ -46,7 +57,7 @@ QuickNurse_Main_Directory/
     ```bash
     npm run dev
     ```
-    The API server should start, typically on `http://localhost:5000`. Look for console messages indicating a successful database connection and server startup. Keep this terminal window open.
+    The API server should start, typically on `http://localhost:5001`. Look for console messages indicating a successful database connection and server startup. Keep this terminal window open.
 
 ## Frontend Setup (`quicknurse-frontend` or your frontend root)
 
@@ -65,10 +76,12 @@ Your frontend is built using Vite.
     ```
 
 3.  **Configure API Base URL (if not already done):**
-    Ensure your frontend's `src/constants.ts` (or equivalent) has the `API_BASE_URL` pointing to your running backend:
-    ```typescript
-    export const API_BASE_URL = 'http://localhost:5000/api';
+    A sample `.env.example` is provided in the project root. Copy it then edit if your API is not running on `http://localhost:5001`:
+    ```bash
+    cp .env.example .env
+    # then edit .env and set VITE_API_BASE_URL="https://your-api.example.com/api"
     ```
+    If no `.env` file is provided, the app falls back to `http://localhost:5001/api` for local development.
 
 4.  **Run the Frontend Development Server:**
     ```bash
@@ -94,5 +107,9 @@ Your frontend is built using Vite.
     *   Double-check your `MONGODB_URI` in the backend `.env` file.
     *   Verify your internet connection.
     *   Ensure your IP is whitelisted in MongoDB Atlas.
+    *   If `npm install` fails with ETARGET errors for multer, ensure your `api/package.json` uses `multer` version `^1.4.5-lts.2`.
 
 This README should help you and others get the project running smoothly.
+
+## Nurse Dashboard Prototype
+A prototype HTML dashboard is available in `nurse-dashboard.html` with placeholders for real-time features.

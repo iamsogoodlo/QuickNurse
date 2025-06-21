@@ -144,3 +144,10 @@ export interface ServiceRequestSummaryForNurse {
   requested_at: string; // ISO date string
   status: 'pending' | 'accepted' | 'declined'; // For UI state primarily
 }
+
+export interface NurseDashboardStats {
+  monthly_revenue: number;
+  monthly_jobs: number;
+  average_rating: number;
+  new_requests: ServiceRequestSummaryForNurse[];
+}

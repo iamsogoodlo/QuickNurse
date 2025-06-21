@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { NurseProfile, NurseStatus, ApiError, ServiceRequestSummaryForNurse } from '../types';
-import { updateNurseStatus, getNurseProfile } from '../services/nurseService';
+import { NurseProfile, NurseStatus, ApiError, ServiceRequestSummaryForNurse, NurseDashboardStats } from '../types';
+import { updateNurseStatus, getNurseProfile, getNurseDashboard } from '../services/nurseService';
 import Button from '../components/common/Button';
 import Select from '../components/common/Select';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -46,7 +46,9 @@ const NurseDashboardPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const [incomingRequests, setIncomingRequests] = useState<ServiceRequestSummaryForNurse[]>(mockRequests);
+  const [dashboardStats, setDashboardStats] = useState<NurseDashboardStats | null>(null);
+
+  const [incomingRequests, setIncomingRequests] = useState<ServiceRequestSummaryForNurse[]>([]);
 
 
   useEffect(() => {
@@ -74,6 +76,21 @@ const NurseDashboardPage: React.FC = () => {
         setError("Not authenticated.");
     }
   }, [token, logout, nurseProfile?.total_earnings]);
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      if (token && nurseProfile?.nurse_id) {
+        const res = await getNurseDashboard(nurseProfile.nurse_id, token);
+        if (res.success && res.data) {
+          setDashboardStats(res.data);
+          setIncomingRequests(res.data.new_requests);
+        }
+      }
+    };
+    fetchDashboard();
+    const interval = setInterval(fetchDashboard, 10000);
+    return () => clearInterval(interval);
+  }, [token, nurseProfile?.nurse_id]);
 
   const handleOnlineOfflineToggle = async () => {
     if (!token) {
@@ -217,6 +234,23 @@ const NurseDashboardPage: React.FC = () => {
                     <p><strong>Account:</strong> <span className="capitalize font-medium">{nurseProfile.account_status}</span></p>
                     <p><strong>Verification:</strong> <span className="capitalize font-medium text-green-600">{nurseProfile.verification_status}</span></p>
                 </div>
+            </div>
+
+            {/* Monthly Stats */}
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+                 <div className="flex items-center mb-4">
+                    <ClipboardDocumentListIcon className="h-6 w-6 text-teal-500 mr-3" />
+                    <h2 className="text-xl font-semibold text-gray-700">This Month</h2>
+                </div>
+                {dashboardStats ? (
+                  <div className="space-y-1.5 text-sm text-gray-600">
+                    <p><strong>Revenue:</strong> ${dashboardStats.monthly_revenue.toFixed(2)}</p>
+                    <p><strong>Jobs Taken:</strong> {dashboardStats.monthly_jobs}</p>
+                    <p><strong>Rating:</strong> {dashboardStats.average_rating.toFixed(1)} / 5</p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500">Loading...</p>
+                )}
             </div>
         </div>
         

@@ -39,3 +39,11 @@ export const getNurseProfile = async (token: string): Promise<ApiResponse<NurseP
     // Assumed endpoint, not in provided backend code
     return apiService<NurseProfile>(NURSE_ENDPOINTS.PROFILE, 'GET', undefined, token);
 };
+
+export const getNurseDashboard = async (
+  nurseId: string,
+  token?: string
+): Promise<ApiResponse<NurseDashboardStats>> => {
+  const url = `${NURSE_ENDPOINTS.DASHBOARD}?nurse_id=${nurseId}`;
+  return apiService<NurseDashboardStats>(url, 'GET', undefined, token);
+};
