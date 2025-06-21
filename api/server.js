@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
 });
 
 // Basic Error Handling Middleware (Keep this last before app.listen)
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   console.error(err.stack);
   res.status(500).send({ success: false, error: 'Something broke on the server!' });
 });

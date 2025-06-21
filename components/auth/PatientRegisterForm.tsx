@@ -121,7 +121,7 @@ const PatientRegisterForm: React.FC = () => {
             zip_code: formData.address.zip_code,
         }
     };
-    const { confirmPassword, ...apiData } = submissionData;
+    const { confirmPassword: _confirmPassword, ...apiData } = submissionData;
 
     const response = await registerPatient(apiData);
     setIsLoading(false);

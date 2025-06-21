@@ -6,8 +6,7 @@ import { LicenseType, NurseSpecialty, NurseCertification, NurseStatus } from './
 // Fallback to localhost for local development.
 export const API_BASE_URL =
   (typeof import.meta !== 'undefined' &&
-    (import.meta as any).env &&
-    (import.meta as any).env.VITE_API_BASE_URL) ||
+    (import.meta as { env?: Record<string, string> }).env?.VITE_API_BASE_URL) ||
   'http://localhost:5001/api';
 
 export const AUTH_ENDPOINTS = {

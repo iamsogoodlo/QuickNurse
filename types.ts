@@ -95,7 +95,7 @@ export interface AuthResponseData {
 
 export interface ApiError {
   message: string;
-  details?: any;
+  details?: unknown;
 }
 
 export interface ApiResponse<T> {
