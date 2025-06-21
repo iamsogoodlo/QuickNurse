@@ -121,4 +121,73 @@ router.get('/request/:requestId/nurse-location', async (req, res) => {
   }
 });
 
+// GET /api/tracking/nurses/nearby
+// Find closest available nurses using general location
+router.get('/nurses/nearby', async (req, res) => {
+  try {
+    const { latitude, longitude, radius = 15, service_type } = req.query;
+
+    if (!latitude || !longitude) {
+      return res.status(400).json({
+        success: false,
+        error: 'Latitude and longitude required'
+      });
+    }
+
+    const radiusInMeters = parseFloat(radius) * 1609.34;
+
+    const nurses = await Nurse.find({
+      general_location: {
+        $near: {
+          $geometry: { type: 'Point', coordinates: [parseFloat(longitude), parseFloat(latitude)] },
+          $maxDistance: radiusInMeters
+        }
+      },
+      account_status: 'active',
+      verification_status: 'verified',
+      is_online: true,
+      current_status: 'available',
+      'precise_location.is_tracking': false
+    }).select('-password -documents').limit(10);
+
+    const { calculateTotalPrice } = require('../config/pricing');
+
+    const nursesWithPricing = nurses.map(nurse => {
+      const distance = calculateDistance(
+        parseFloat(latitude),
+        parseFloat(longitude),
+        nurse.general_location.coordinates[1],
+        nurse.general_location.coordinates[0]
+      );
+
+      const pricing = calculateTotalPrice(
+        service_type,
+        distance,
+        'normal',
+        new Date()
+      );
+
+      return {
+        nurse_id: nurse.nurse_id,
+        first_name: nurse.first_name,
+        last_name: nurse.last_name,
+        specialties: nurse.specialties,
+        years_experience: nurse.years_experience,
+        average_rating: nurse.average_rating,
+        total_completed_visits: nurse.total_completed_visits,
+        distance_miles: Math.round(distance * 10) / 10,
+        estimated_arrival_minutes: Math.round(distance * 3 + 5),
+        pricing,
+        general_location: nurse.general_location
+      };
+    });
+
+    nursesWithPricing.sort((a, b) => a.distance_miles - b.distance_miles);
+
+    res.json({ success: true, count: nursesWithPricing.length, nurses: nursesWithPricing });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;
