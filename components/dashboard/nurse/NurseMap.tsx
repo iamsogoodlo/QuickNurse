@@ -1,49 +1,44 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
-const GOOGLE_MAPS_URL = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY`;
+// Fix default icon path in Leaflet when bundled
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
+
+const UpdatePosition: React.FC<{ position: L.LatLngExpression }> = ({ position }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(position);
+  }, [position, map]);
+  return <Marker position={position} />;
+};
 
 const NurseMap: React.FC = () => {
-  const mapRef = useRef<HTMLDivElement | null>(null);
-  const mapInstance = useRef<google.maps.Map>();
-  const nurseMarker = useRef<google.maps.Marker>();
+  const [position, setPosition] = useState<L.LatLngExpression>({ lat: 37.7749, lng: -122.4194 });
 
   useEffect(() => {
-    const loadScript = () => {
-      if (document.getElementById('google-maps-script')) {
-        initMap();
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = GOOGLE_MAPS_URL;
-      script.async = true;
-      script.id = 'google-maps-script';
-      script.onload = initMap;
-      document.body.appendChild(script);
-    };
-
-    const initMap = () => {
-      if (!mapRef.current) return;
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          const center = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          mapInstance.current = new google.maps.Map(mapRef.current!, {
-            center,
-            zoom: 14,
-          });
-          nurseMarker.current = new google.maps.Marker({ map: mapInstance.current!, position: center });
-        },
-        () => {
-          const defaultCenter = { lat: 37.7749, lng: -122.4194 };
-          mapInstance.current = new google.maps.Map(mapRef.current!, { center: defaultCenter, zoom: 12 });
-          nurseMarker.current = new google.maps.Marker({ map: mapInstance.current!, position: defaultCenter });
-        }
-      );
-    };
-
-    loadScript();
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(p => {
+        setPosition({ lat: p.coords.latitude, lng: p.coords.longitude });
+      });
+    }
   }, []);
 
-  return <div ref={mapRef} className="w-full h-64 bg-gray-200 rounded-lg" />;
+  return (
+    <MapContainer center={position} zoom={13} style={{ height: '250px', width: '100%' }}>
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
+      <UpdatePosition position={position} />
+    </MapContainer>
+  );
 };
 
 export default NurseMap;
