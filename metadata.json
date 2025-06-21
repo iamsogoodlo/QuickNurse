@@ -1,0 +1,5 @@
+{
+  "name": "QuickNurse: On-Demand Nursing Care",
+  "description": "A platform connecting patients with registered nurses for on-demand healthcare services. This application provides user registration, login, and the ability for patients to find nearby nurses.",
+  "requestFramePermissions": []
+}
