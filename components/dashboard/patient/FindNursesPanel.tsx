@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import { findNearbyNurses } from '../../../services/nurseService';
-import { NearbyNurse, NurseSpecialty, ApiError, PatientProfile } from '../../../types';
+import { NearbyNurse, ApiError, PatientProfile } from '../../../types';
 import { useAuth } from '../../../hooks/useAuth';
 import Input from '../../common/Input';
 import Button from '../../common/Button';
