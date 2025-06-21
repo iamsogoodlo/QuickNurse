@@ -71,10 +71,11 @@ Your frontend is built using Vite.
     ```
 
 3.  **Configure API Base URL (if not already done):**
-    Ensure your frontend's `src/constants.ts` (or equivalent) has the `API_BASE_URL` pointing to your running backend:
-    ```typescript
-    export const API_BASE_URL = 'http://localhost:5000/api';
+    The frontend can read a `VITE_API_BASE_URL` environment variable at build time. Create a `.env` file if needed:
+    ```bash
+    VITE_API_BASE_URL="https://your-api.example.com/api"
     ```
+    If no variable is provided, the app falls back to `http://localhost:5000/api` for local development.
 
 4.  **Run the Frontend Development Server:**
     ```bash

@@ -1,10 +1,14 @@
 
 import { LicenseType, NurseSpecialty, NurseCertification, NurseStatus } from './types';
 
-// MODIFIED for local development: Points to your backend server
-// Default backend URL
-// The backend server runs on port 5000 by default as documented in the README
-export const API_BASE_URL = 'http://localhost:5000/api';
+// Base URL for the backend API.
+// `VITE_API_BASE_URL` can be provided at build time to override the default.
+// Fallback to localhost for local development.
+export const API_BASE_URL =
+  (typeof import.meta !== 'undefined' &&
+    (import.meta as any).env &&
+    (import.meta as any).env.VITE_API_BASE_URL) ||
+  'http://localhost:5000/api';
 
 export const AUTH_ENDPOINTS = {
   NURSE_REGISTER: API_BASE_URL + '/auth/nurse/register',
