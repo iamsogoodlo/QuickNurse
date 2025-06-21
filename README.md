@@ -103,3 +103,6 @@ Your frontend is built using Vite.
     *   If `npm install` fails with ETARGET errors for multer, ensure your `api/package.json` uses `multer` version `^1.4.5-lts.2`.
 
 This README should help you and others get the project running smoothly.
+
+## Nurse Dashboard Prototype
+A prototype HTML dashboard is available in `nurse-dashboard.html` with placeholders for real-time features.
