@@ -7,7 +7,7 @@ import Input from '../common/Input';
 import Button from '../common/Button';
 import Select from '../common/Select';
 import CheckboxGroup from '../common/CheckboxGroup';
-import { LICENSE_TYPE_OPTIONS, NURSE_SPECIALTY_OPTIONS, NURSE_CERTIFICATION_OPTIONS, US_STATES } from '../../constants';
+import { LICENSE_TYPE_OPTIONS, NURSE_SPECIALTY_OPTIONS, NURSE_CERTIFICATION_OPTIONS, CA_PROVINCES } from '../../constants';
 import { LicenseType, NurseSpecialty, NurseCertification, ApiError } from '../../types';
 
 interface NurseRegisterErrors {
@@ -43,10 +43,10 @@ const NurseRegisterForm: React.FC = () => {
     phone: '',
     service_address_street: '',
     service_address_city: '',
-    service_address_state: US_STATES[0],
+    service_address_state: CA_PROVINCES[0],
     service_address_zip_code: '',
     license_number: '',
-    license_state: US_STATES[0],
+    license_state: CA_PROVINCES[0],
     license_type: LICENSE_TYPE_OPTIONS[0] as LicenseType,
     years_experience: '0',
     specialties: [] as NurseSpecialty[],
@@ -243,7 +243,7 @@ const NurseRegisterForm: React.FC = () => {
                 isRequired
                 value={formData.service_address_state}
                 onChange={handleChange}
-                options={US_STATES.map(s => ({ value: s, label: s }))}
+                options={CA_PROVINCES.map(s => ({ value: s, label: s }))}
                 error={errors.service_address_state}
             />
             <Input id="service_address_zip_code" label="Zip Code" name="service_address_zip_code" required isRequired value={formData.service_address_zip_code} onChange={handleChange} error={errors.service_address_zip_code}/>
@@ -268,7 +268,7 @@ const NurseRegisterForm: React.FC = () => {
                 isRequired
                 value={formData.license_state}
                 onChange={handleChange}
-                options={US_STATES.map(s => ({ value: s, label: s }))}
+                options={CA_PROVINCES.map(s => ({ value: s, label: s }))}
                 error={errors.license_state}
             />
           </div>

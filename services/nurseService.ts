@@ -1,6 +1,6 @@
 
 import { apiService } from './api';
-import { NURSE_ENDPOINTS } from '../constants';
+import { NURSE_ENDPOINTS, API_BASE_URL } from '../constants';
 import { ApiResponse, NearbyNurse, NurseProfile, NurseStatus, NurseDashboardStats } from '../types';
 
 export const findNearbyNurses = async (
@@ -53,4 +53,21 @@ export const getNurseDashboard = async (
 ): Promise<ApiResponse<NurseDashboardStats>> => {
   const url = `${NURSE_ENDPOINTS.DASHBOARD}?nurse_id=${nurseId}`;
   return apiService<NurseDashboardStats>(url, 'GET', undefined, token);
+};
+
+export const uploadNurseDocument = async (
+  nurseId: string,
+  documentType: string,
+  file: File,
+  token: string
+): Promise<ApiResponse<unknown>> => {
+  const formData = new FormData();
+  formData.append('document_type', documentType);
+  formData.append('document', file);
+  return apiService<unknown>(
+    `${API_BASE_URL}/documents/nurse/${nurseId}/upload`,
+    'POST',
+    formData,
+    token
+  );
 };

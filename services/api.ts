@@ -37,18 +37,25 @@ export async function apiService<T>(
   body?: unknown,
   token?: string | null
 ): Promise<ApiResponse<T>> {
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
+  const headers: HeadersInit = {};
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
   }
 
   try {
     const response = await fetch(url, {
       method,
       headers,
-      body: body ? JSON.stringify(body) : undefined,
+      body: body
+        ? isFormData
+          ? (body as FormData)
+          : JSON.stringify(body)
+        : undefined,
     });
     return handleApiResponse<T>(response);
   } catch (error: unknown) {

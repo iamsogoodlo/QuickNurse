@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
+import Select from '../components/common/Select';
 import { useAuth } from '../hooks/useAuth';
 import { updatePatientProfile } from '../services/patientService';
 import { PatientProfile } from '../types';
+import { CA_PROVINCES } from '../constants';
 
 const PatientSettingsPage: React.FC = () => {
   const { user, token } = useAuth();
@@ -14,13 +16,27 @@ const PatientSettingsPage: React.FC = () => {
     last_name: patient?.last_name || '',
     phone: patient?.phone || '',
     email: patient?.email || '',
+    address: {
+      street: patient?.address?.street || '',
+      city: patient?.address?.city || '',
+      state: patient?.address?.state || CA_PROVINCES[0],
+      zip_code: patient?.address?.zip_code || '',
+    },
   });
 
   const [message, setMessage] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name.startsWith('address.')) {
+      const field = name.split('.')[1];
+      setFormData(prev => ({
+        ...prev,
+        address: { ...prev.address, [field]: value }
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,6 +85,38 @@ const PatientSettingsPage: React.FC = () => {
           name="phone"
           label="Phone"
           value={formData.phone}
+          onChange={handleChange}
+          required
+        />
+        <Input
+          id="address.street"
+          name="address.street"
+          label="Street Address"
+          value={formData.address.street}
+          onChange={handleChange}
+          required
+        />
+        <Input
+          id="address.city"
+          name="address.city"
+          label="City"
+          value={formData.address.city}
+          onChange={handleChange}
+          required
+        />
+        <Select
+          id="address.state"
+          name="address.state"
+          label="Province"
+          value={formData.address.state}
+          onChange={handleChange}
+          options={CA_PROVINCES.map(p => ({ value: p, label: p }))}
+        />
+        <Input
+          id="address.zip_code"
+          name="address.zip_code"
+          label="Postal Code"
+          value={formData.address.zip_code}
           onChange={handleChange}
           required
         />
