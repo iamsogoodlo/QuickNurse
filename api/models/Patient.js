@@ -34,6 +34,8 @@ const patientSchema = new mongoose.Schema({
   total_requests: { type: Number, default: 0 },
   completed_visits: { type: Number, default: 0 },
   total_spent: { type: Number, default: 0 },
+
+  last_placed_order: Date,
   
   preferred_nurses: [{ type: mongoose.Schema.Types.String, ref: 'Nurse' }], // Storing nurse_id as string
   
