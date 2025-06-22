@@ -158,15 +158,19 @@ All accounts share a fixed location near Times Square in New York City so you ca
 
 ## Example End-to-End Demo
 
-Follow these steps to simulate a patient creating a service request and a nurse accepting it using the API directly.
+Follow these steps from the project root to simulate a patient creating a service request and a nurse accepting it using the API directly.
 
 1. **Start the servers** (after running the seed command above):
 
    ```bash
+   cd path/to/QuickNurse
    npm run dev:all
    ```
 
-2. **Log in as a patient** to obtain a JWT and the `patient_id`:
+   Keep this terminal running.
+
+2. **Open another terminal** in the same directory and run the cURL commands below.
+3. **Log in as a patient** to obtain a JWT and the `patient_id`:
 
    ```bash
    curl -X POST http://localhost:5001/api/auth/patient/login \
@@ -176,7 +180,7 @@ Follow these steps to simulate a patient creating a service request and a nurse 
 
    Copy the `token` and `patient.patient_id` values from the JSON response.
 
-3. **Create a service order** using the patient token and id:
+4. **Create a service order** using the patient token and id:
 
    ```bash
    curl -X POST http://localhost:5001/api/orders \
@@ -185,7 +189,7 @@ Follow these steps to simulate a patient creating a service request and a nurse 
      -d '{"orderId":"demo_order1","patientId":"PATIENT_ID","serviceDetails":{"serviceType":"wound_care","description":"Demo visit"},"location":{"address":{"street":"123 Main St","city":"New York","state":"NY","zipCode":"10001"},"coordinates":[-73.9855,40.7580],"locationType":"home"}}'
    ```
 
-4. **Log in as a nurse** and capture the `nurse_id` and token:
+5. **Log in as a nurse** and capture the `nurse_id` and token:
 
    ```bash
    curl -X POST http://localhost:5001/api/auth/nurse/login \
@@ -193,7 +197,7 @@ Follow these steps to simulate a patient creating a service request and a nurse 
      -d '{"email":"nurse1@example.com","password":"nursepass"}'
    ```
 
-5. **Accept the order** using the nurse token and id:
+6. **Accept the order** using the nurse token and id:
 
    ```bash
    curl -X PUT http://localhost:5001/api/orders/demo_order1/accept \
@@ -203,4 +207,3 @@ Follow these steps to simulate a patient creating a service request and a nurse 
    ```
 
 The response will show the order marked as `accepted`, demonstrating the end-to-end interaction without relying on the unfinished frontend pages.
-
