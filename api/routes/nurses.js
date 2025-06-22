@@ -102,9 +102,7 @@ router.get('/nearby', async (req, res) => {
         }
       },
       account_status: 'active',
-      verification_status: 'verified',
-      is_online: true,
-      current_status: 'available'
+      verification_status: 'verified'
     };
 
     if (specialty && specialty !== 'all') {
@@ -155,6 +153,8 @@ router.get('/nearby', async (req, res) => {
           specialties: nurse.specialties,
           years_experience: nurse.years_experience,
           average_rating: nurse.average_rating,
+          hourly_rate: nurse.hourly_rate,
+          is_online: nurse.is_online,
           general_location: nurse.general_location,
           pricing,
           distance: parseFloat(distance.toFixed(1))

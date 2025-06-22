@@ -33,14 +33,17 @@ const NurseCard: React.FC<NurseCardProps> = ({ nurse }) => {
     <div className="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300">
       <div className="p-6">
         <div className="flex items-center mb-4">
-          <img 
-            src={`https://picsum.photos/seed/${nurse.nurse_id}/80/80`} 
+          <img
+            src={`https://picsum.photos/seed/${nurse.nurse_id}/80/80`}
             alt={`${nurse.first_name} ${nurse.last_name}`}
             className="w-20 h-20 rounded-full mr-4 border-2 border-teal-500"
           />
           <div>
             <h3 className="text-xl font-semibold text-gray-800">{nurse.first_name} {nurse.last_name}</h3>
             <p className="text-sm text-teal-600">{nurse.specialties.slice(0,2).map(s => s.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())).join(', ')}</p>
+            {!nurse.is_online && (
+              <p className="text-xs text-red-500 mt-1">Currently Offline</p>
+            )}
           </div>
         </div>
 
@@ -59,8 +62,13 @@ const NurseCard: React.FC<NurseCardProps> = ({ nurse }) => {
             <p className="text-xs text-gray-500 text-center">Includes base, distance, and potential surge.</p>
         </div>
         
-        <Button onClick={handleRequestService} variant="primary" fullWidth>
-          Request Service
+        <Button
+          onClick={handleRequestService}
+          variant="primary"
+          fullWidth
+          disabled={!nurse.is_online}
+        >
+          {nurse.is_online ? 'Request Service' : 'Offline'}
         </Button>
       </div>
     </div>
