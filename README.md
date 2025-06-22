@@ -19,6 +19,13 @@ The platform now supports real-time nurse location tracking, photo-based documen
 verification, and fixed pricing with distance and time surcharges. Nurses can
 view monthly revenue, jobs taken, and ratings directly on their dashboard.
 
+### Database Collections
+The backend now defines four main MongoDB collections:
+* **Nurses** – registered caregivers and their availability
+* **Patients** – user profiles and medical details
+* **OrdersReceived** – incoming service requests awaiting fulfillment
+* **OrdersFulfilled** – records of completed or cancelled visits
+
 ## Prerequisites
 
 *   Node.js (v18 or later recommended) and npm

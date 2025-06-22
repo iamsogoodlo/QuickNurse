@@ -12,6 +12,7 @@ const nurseRequestRoutes = require('./routes/nurse-requests');
 // Add other route imports here if you create them:
 // const patientRoutes = require('./routes/patients');
 const serviceRequestRoutes = require('./routes/serviceRequests');
+const ordersRoutes = require('./routes/orders');
 
 
 const app = express();
@@ -32,6 +33,7 @@ app.use('/api/documents', documentRoutes);
 app.use('/api/requests', nurseRequestRoutes);
 // app.use('/api/patients', patientRoutes); // Example for future
 app.use('/api/servicerequests', serviceRequestRoutes);
+app.use('/api/orders', ordersRoutes);
 
 // Simple root route for health check or API info
 app.get('/', (req, res) => {
