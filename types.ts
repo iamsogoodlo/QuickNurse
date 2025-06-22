@@ -123,8 +123,9 @@ export interface NearbyNurse {
   specialties: NurseSpecialty[];
   years_experience: number;
   average_rating: number;
-  hourly_rate: number; 
-  location: GeoLocation; 
+  hourly_rate: number;
+  is_online: boolean;
+  location: GeoLocation;
   pricing: {
     totalPrice: number;
     nurseEarnings: number;
