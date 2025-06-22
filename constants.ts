@@ -33,6 +33,12 @@ export const SERVICE_REQUEST_ENDPOINTS = {
   NURSE_REQUESTS: API_BASE_URL + '/servicerequests/nurse', // Assumed endpoint
 };
 
+export const ORDER_ENDPOINTS = {
+  CREATE: API_BASE_URL + '/orders',
+  PENDING: API_BASE_URL + '/orders/pending',
+  ACCEPT: (id: string) => API_BASE_URL + `/orders/${id}/accept`,
+};
+
 export const LICENSE_TYPE_OPTIONS = Object.values(LicenseType);
 export const NURSE_SPECIALTY_OPTIONS = Object.values(NurseSpecialty);
 export const NURSE_CERTIFICATION_OPTIONS = Object.values(NurseCertification);
