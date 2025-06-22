@@ -1,42 +1,44 @@
-import React, { useState } from 'react';
-import NurseMap from '../components/dashboard/nurse/NurseMap';
+import React, { useState, useEffect } from 'react';
+import UserLocationMap from '../components/common/UserLocationMap';
 import ServiceRequestCardNurseView from '../components/dashboard/nurse/ServiceRequestCardNurseView';
-import { ServiceRequestSummaryForNurse } from '../types';
+import { ServiceRequestSummaryForNurse, OrderReceived, NurseProfile } from '../types';
+import { getPendingOrders, acceptOrder } from '../services/orderService';
+import { useAuth } from '../hooks/useAuth';
 
-const mockNearbyRequests: ServiceRequestSummaryForNurse[] = [
-  {
-    request_id: '1',
-    patient_display_name: 'Patient J.D.',
-    service_type: 'Wound Care',
-    approx_distance_miles: 2,
-    patient_city_state: 'San Francisco, CA',
-    estimated_earnings: 50,
-    requested_at: new Date().toISOString(),
-    status: 'pending',
-  },
-  {
-    request_id: '2',
-    patient_display_name: 'Patient A.B.',
-    service_type: 'IV Therapy',
-    approx_distance_miles: 3,
-    patient_city_state: 'San Francisco, CA',
-    estimated_earnings: 70,
-    requested_at: new Date().toISOString(),
-    status: 'pending',
-  },
-];
+const mapOrderToSummary = (order: OrderReceived): ServiceRequestSummaryForNurse => ({
+  request_id: order.orderId,
+  patient_display_name: `Patient ${order.patientId.slice(-4)}`,
+  service_type: order.serviceDetails.serviceType,
+  approx_distance_miles: undefined,
+  patient_city_state: `${order.location.address.city}, ${order.location.address.state}`,
+  estimated_earnings: order.pricing?.estimatedTotal ?? 0,
+  requested_at: order.requestedAt,
+  status: order.status as 'pending' | 'accepted' | 'declined',
+});
 
 const NurseDashboardPage: React.FC = () => {
+  const { token, user } = useAuth();
   const [isOnline, setIsOnline] = useState(false);
-  const [nearbyRequests, setNearbyRequests] = useState(mockNearbyRequests);
+  const [nearbyRequests, setNearbyRequests] = useState<ServiceRequestSummaryForNurse[]>([]);
   const [activeRequest, setActiveRequest] = useState<ServiceRequestSummaryForNurse | null>(null);
 
   const toggleOnline = () => setIsOnline((prev) => !prev);
 
-  const handleAccept = (id: string) => {
-    const req = nearbyRequests.find((r) => r.request_id === id);
-    if (req) {
-      setActiveRequest(req);
+  useEffect(() => {
+    async function load() {
+      const res = await getPendingOrders();
+      if (res.success && res.data) {
+        setNearbyRequests(res.data.map(mapOrderToSummary));
+      }
+    }
+    load();
+  }, []);
+
+  const handleAccept = async (id: string) => {
+    if (!token || !user) return;
+    const res = await acceptOrder(id, (user as NurseProfile).nurse_id, token);
+    if (res.success && res.data) {
+      setActiveRequest(mapOrderToSummary(res.data));
       setNearbyRequests(nearbyRequests.filter((r) => r.request_id !== id));
     }
   };
@@ -94,7 +96,7 @@ const NurseDashboardPage: React.FC = () => {
 
           <div className="bg-white rounded-2xl shadow p-6">
             <h2 className="text-lg font-semibold mb-4">Live Map</h2>
-            <NurseMap />
+            <UserLocationMap />
           </div>
 
           <div className="bg-white rounded-2xl shadow p-6">

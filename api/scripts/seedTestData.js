@@ -85,8 +85,16 @@ async function seed() {
   await Nurse.deleteMany({ email: { $in: nurseData.map(n => n.email) } });
   await Patient.deleteMany({ email: { $in: patientData.map(p => p.email) } });
 
-  await Nurse.insertMany(nurseData);
-  await Patient.insertMany(patientData);
+  // Use .save() on individual documents so pre-save hooks (like password hashing) run
+  for (const data of nurseData) {
+    const doc = new Nurse(data);
+    await doc.save();
+  }
+
+  for (const data of patientData) {
+    const doc = new Patient(data);
+    await doc.save();
+  }
 
   console.log('Seeded test nurses and patients');
   console.log('Nurse logins:');
