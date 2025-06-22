@@ -120,3 +120,7 @@ This README should help you and others get the project running smoothly.
 
 ## Nurse Dashboard Prototype
 A prototype HTML dashboard is available in `nurse-dashboard.html` with placeholders for real-time features.
+
+## Mock Testing Setup
+
+For development without a real backend, a mock database is included in the `mock` directory. It defines clusters of doctors and patients around New York City. Use the **Test Mode** button on the authentication page to quickly log in as any test user. The mock API found in `mock/mockApi.ts` simulates fetching nearby doctors and creating orders.
