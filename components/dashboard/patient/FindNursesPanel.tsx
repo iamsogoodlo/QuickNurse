@@ -11,6 +11,7 @@ import NurseCard from './NurseCard';
 import { NURSE_SPECIALTY_OPTIONS, CA_PROVINCES } from '../../../constants';
 import RequestServiceModal from './RequestServiceModal';
 import UserLocationMap from '../../common/UserLocationMap';
+import PatientNurseMap from '../../common/PatientNurseMap';
 import { geocodeAddress, reverseGeocode } from '../../../services/geocodingService';
 
 const FindNursesPanel: React.FC = () => {
@@ -29,6 +30,8 @@ const FindNursesPanel: React.FC = () => {
   const { token, user, userType } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [modalServiceType, setModalServiceType] = useState<string>('general');
+  const [selectedNurse, setSelectedNurse] = useState<NearbyNurse | null>(null);
+  const [orderPlacedWith, setOrderPlacedWith] = useState<NearbyNurse | null>(null);
 
 
   useEffect(() => {
@@ -200,6 +203,26 @@ const FindNursesPanel: React.FC = () => {
             <UserLocationMap latitude={coords?.lat} longitude={coords?.lng} />
           </div>
 
+          {orderPlacedWith && coords && (
+            <div className="mb-6">
+              <div className="p-3 mb-2 bg-teal-50 text-teal-700 text-center rounded">
+                Order placed successfully!
+              </div>
+              <PatientNurseMap
+                patient={{ lat: coords.lat, lng: coords.lng }}
+                nurse={{
+                  lat: orderPlacedWith.location.coordinates[1],
+                  lng: orderPlacedWith.location.coordinates[0],
+                }}
+              />
+              <div className="flex justify-end pt-2">
+                <Button variant="primary" onClick={() => setOrderPlacedWith(null)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+
           {error && <div className="p-3 mb-4 bg-red-100 text-red-700 border border-red-300 rounded-md text-sm">{error}</div>}
           
           {isLoading && <div className="flex justify-center py-8"><LoadingSpinner /></div>}
@@ -209,7 +232,15 @@ const FindNursesPanel: React.FC = () => {
               <h3 className="text-lg font-medium text-gray-700 mb-4">Available Nurses ({nurses.length})</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-x-6 gap-y-8"> {/* Adjusted for potentially 2 cards per row on larger screens in this layout */}
                 {nurses.map(nurse => (
-                  <NurseCard key={nurse.nurse_id} nurse={nurse} onRequest={() => { setModalServiceType(serviceType); setShowModal(true); }} />
+                  <NurseCard
+                    key={nurse.nurse_id}
+                    nurse={nurse}
+                    onRequest={(n) => {
+                      setSelectedNurse(n);
+                      setModalServiceType(serviceType);
+                      setShowModal(true);
+                    }}
+                  />
                 ))}
               </div>
             </div>
@@ -224,8 +255,14 @@ const FindNursesPanel: React.FC = () => {
       </div>
       <RequestServiceModal
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={() => { setShowModal(false); setSelectedNurse(null); }}
         defaultServiceType={modalServiceType}
+        nurse={selectedNurse}
+        onOrderPlaced={(n) => {
+          setOrderPlacedWith(n);
+          setShowModal(false);
+          setSelectedNurse(null);
+        }}
       />
     </div>
   );
