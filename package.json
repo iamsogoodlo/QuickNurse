@@ -7,6 +7,7 @@
     "dev": "vite",
     "dev:api": "npm --prefix api run dev",
     "dev:all": "concurrently -k \"npm run dev:api\" \"npm run dev\"",
+    "seed": "npm --prefix api run seed",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "test": "vitest run",

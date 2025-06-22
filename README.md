@@ -67,9 +67,11 @@ The backend now defines four main MongoDB collections:
     The API server should start, typically on `http://localhost:5001`. Look for console messages indicating a successful database connection and server startup. Keep this terminal window open.
 
 5.  **Seed the Database with Test Accounts (Run Once):**
-    In the same `quicknurse-api` directory, populate MongoDB with sample nurses and patients. The script saves each record individually so password hashing hooks run correctly:
+    Populate MongoDB with sample nurses and patients so you can log in immediately. You can run the seed command from the project root (it forwards to the API folder) **or** from inside `quicknurse-api`:
     ```bash
-    npm run seed
+    npm run seed            # from the project root
+    # or
+    cd quicknurse-api && npm run seed
     ```
     The script prints each email/password combination. Use these credentials when testing logins.
 
