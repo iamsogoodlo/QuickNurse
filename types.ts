@@ -119,19 +119,51 @@ export interface NearbyNurse {
   nurse_id: string;
   first_name: string;
   last_name: string;
-  email: string; 
+  email: string;
   specialties: NurseSpecialty[];
   years_experience: number;
   average_rating: number;
-  hourly_rate: number; 
-  location: GeoLocation; 
+  hourly_rate: number;
+  location: GeoLocation;
   pricing: {
     totalPrice: number;
     nurseEarnings: number;
     platformFee: number;
     breakdown: PricingBreakdown;
   };
-  distance: number; 
+  distance: number;
+}
+
+export interface OrderServiceDetails {
+  serviceType: string;
+  description?: string;
+  duration?: number;
+  urgency?: string;
+  scheduledDate?: string;
+  scheduledTime?: string;
+  estimatedEndTime?: string;
+}
+
+export interface OrderLocation {
+  type: 'Point';
+  coordinates: [number, number];
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
+  locationType?: string;
+}
+
+export interface OrderReceived {
+  orderId: string;
+  patientId: string;
+  serviceDetails: OrderServiceDetails;
+  location: OrderLocation;
+  status: string;
+  requestedAt: string;
+  pricing?: { estimatedTotal?: number };
 }
 
 export interface ServiceRequestSummaryForNurse {

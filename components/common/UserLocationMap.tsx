@@ -22,16 +22,23 @@ const UpdatePosition: React.FC<{ position: L.LatLngExpression }> = ({ position }
   return <Marker position={position} />;
 };
 
-const NurseMap: React.FC = () => {
-  const [position, setPosition] = useState<L.LatLngExpression>({ lat: 37.7749, lng: -122.4194 });
+interface Props {
+  latitude?: number;
+  longitude?: number;
+}
+
+const UserLocationMap: React.FC<Props> = ({ latitude, longitude }) => {
+  const [position, setPosition] = useState<L.LatLngExpression>({ lat: latitude ?? 37.7749, lng: longitude ?? -122.4194 });
 
   useEffect(() => {
-    if (navigator.geolocation) {
+    if (latitude !== undefined && longitude !== undefined) {
+      setPosition({ lat: latitude, lng: longitude });
+    } else if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(p => {
         setPosition({ lat: p.coords.latitude, lng: p.coords.longitude });
       });
     }
-  }, []);
+  }, [latitude, longitude]);
 
   return (
     <MapContainer center={position} zoom={13} style={{ height: '250px', width: '100%' }}>
@@ -41,4 +48,4 @@ const NurseMap: React.FC = () => {
   );
 };
 
-export default NurseMap;
+export default UserLocationMap;

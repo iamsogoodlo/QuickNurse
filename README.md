@@ -167,17 +167,12 @@ The script prints the credentials for each account. Default logins are:
 All accounts share a fixed location near Times Square in New York City so you can reliably test nearby search and booking features.
 
 ## Example End-to-End Demo
-
-1. **Start the servers** (after running the seed command above):
-
-   ```bash
    curl -X POST http://localhost:5001/api/auth/patient/login \
      -H 'Content-Type: application/json' \
      -d '{"email":"patient1@example.com","password":"patientpass"}'
    ```
 
    Copy the `token` and `patient.patient_id` values from the JSON response.
-
 
    ```bash
    curl -X POST http://localhost:5001/api/orders \
@@ -196,5 +191,3 @@ All accounts share a fixed location near Times Square in New York City so you ca
      -H "Authorization: Bearer NURSE_TOKEN" \
      -d '{"nurseId":"NURSE_ID"}'
    ```
-
-The response will show the order marked as `accepted`, demonstrating the end-to-end interaction without relying on the unfinished frontend pages.
