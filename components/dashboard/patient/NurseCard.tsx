@@ -34,7 +34,10 @@ const NurseCard: React.FC<NurseCardProps> = ({ nurse, serviceType, lat, lng }) =
       patient_id: patient.patient_id,
       nurse_id: nurse.nurse_id,
       service_type: serviceType,
-      patient_location: { type: 'Point', coordinates: [parseFloat(lng), parseFloat(lat)] },
+      patient_location: {
+        type: 'Point' as const,
+        coordinates: [parseFloat(lng), parseFloat(lat)] as [number, number],
+      },
       patient_address: patient.address,
       service_base_price: nurse.pricing.breakdown.basePrice,
       total_price: nurse.pricing.totalPrice,

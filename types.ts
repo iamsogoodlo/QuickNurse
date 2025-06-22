@@ -141,6 +141,13 @@ export interface ServiceRequest {
   service_type: string;
   patient_location: { type: 'Point'; coordinates: [number, number] };
   patient_address?: Address;
+  service_base_price: number;
+  distance_fee?: number;
+  urgency_surcharge?: number;
+  time_surcharge?: number;
+  total_price: number;
+  nurse_earnings: number;
+  platform_fee: number;
   status: string;
   requested_at: string;
 }
