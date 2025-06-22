@@ -3,6 +3,7 @@ import ServiceRequestCardNurseView from '../components/dashboard/nurse/ServiceRe
 import { ServiceRequestSummaryForNurse, OrderReceived, NurseProfile } from '../types';
 import { getPendingOrders, acceptOrder } from '../services/orderService';
 import { useAuth } from '../hooks/useAuth';
+import UserLocationMap from '../components/common/UserLocationMap';
 
 const mapOrderToSummary = (order: OrderReceived): ServiceRequestSummaryForNurse => ({
   request_id: order.orderId,
