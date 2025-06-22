@@ -7,7 +7,7 @@ export const TEST_USERS = {
     { id: 'patient_005', name: 'Lisa Thompson', zone: 'rural' },
     { id: 'patient_006', name: 'James Wilson', zone: 'rural' },
   ],
-  doctors: [
+  nurses: [
     { id: 'doctor_001', name: 'Dr. Amy Stevens, RN', zone: 'downtown', status: 'available' },
     { id: 'doctor_002', name: 'Dr. Carlos Martinez, RN', zone: 'downtown', status: 'busy' },
     { id: 'doctor_003', name: 'Dr. Jennifer Park, RN', zone: 'suburban', status: 'available' },

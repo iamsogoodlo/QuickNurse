@@ -123,7 +123,7 @@ A prototype HTML dashboard is available in `nurse-dashboard.html` with placehold
 
 ## Mock Testing Setup
 
-For development without a real backend, a mock database is included in the `mock` directory. It defines clusters of doctors and patients around New York City. Use the **Test Mode** button on the authentication page to quickly log in as any test user. The mock API found in `mock/mockApi.ts` simulates fetching nearby doctors and creating orders.
+For development without a real backend, a mock database is included in the `mock` directory. It defines clusters of nurses and patients around New York City. Use the **Test Mode** button on the authentication page to quickly log in as any test user. The mock API found in `mock/mockApi.ts` simulates fetching nearby nurses and creating orders.
 
 ## Database Test Seed
 

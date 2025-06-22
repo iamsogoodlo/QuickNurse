@@ -13,7 +13,7 @@ const TestLoginPanel: React.FC = () => {
   const [open, setOpen] = useState(false);
   const { login } = useAuth();
 
-  const loginAs = (user: TestUser, type: 'patient' | 'doctor') => {
+  const loginAs = (user: TestUser, type: 'patient' | 'nurse') => {
     // Minimal authentication simulation
     login({ token: 'mock-token', [type]: { id: user.id, name: user.name } } as any, type as any);
   };
@@ -38,12 +38,12 @@ const TestLoginPanel: React.FC = () => {
               {u.name} ({u.zone})
             </button>
           ))}
-          <h3 className="font-semibold text-sm mt-4">Quick Login - Doctors</h3>
-          {TEST_USERS.doctors.map((u) => (
+          <h3 className="font-semibold text-sm mt-4">Quick Login - Nurses</h3>
+          {TEST_USERS.nurses.map((u) => (
             <button
               key={u.id}
               className="block text-left w-full text-sm text-teal-700 hover:underline"
-              onClick={() => loginAs(u, 'doctor')}
+              onClick={() => loginAs(u, 'nurse')}
             >
               {u.name} ({u.zone}) - {u.status}
             </button>
