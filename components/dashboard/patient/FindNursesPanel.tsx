@@ -8,6 +8,10 @@ import Button from '../../common/Button';
 import Select from '../../common/Select';
 import LoadingSpinner from '../../common/LoadingSpinner';
 import NurseCard from './NurseCard';
+import { NURSE_SPECIALTY_OPTIONS, CA_PROVINCES } from '../../../constants';
+import RequestServiceModal from './RequestServiceModal';
+import UserLocationMap from '../../common/UserLocationMap';
+import { geocodeAddress, reverseGeocode } from '../../../services/geocodingService';
 
 const FindNursesPanel: React.FC = () => {
   const [street, setStreet] = useState<string>('');
@@ -76,6 +80,32 @@ const FindNursesPanel: React.FC = () => {
     } else {
       setError((response.error as ApiError)?.message || "Failed to fetch nurses. Please try again.");
     }
+  };
+
+  const handleUseCurrentLocation = async () => {
+    if (!navigator.geolocation) {
+      setError('Geolocation not supported by your browser.');
+      return;
+    }
+    setIsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (p) => {
+        const { latitude, longitude } = p.coords;
+        setCoords({ lat: latitude, lng: longitude });
+        const addr = await reverseGeocode(latitude, longitude);
+        if (addr) {
+          if (addr.street) setStreet(addr.street);
+          if (addr.city) setCity(addr.city);
+          if (addr.state) setStateProv(addr.state);
+          if (addr.zip) setZip(addr.zip);
+        }
+        setIsLoading(false);
+      },
+      () => {
+        setError('Unable to retrieve your current location.');
+        setIsLoading(false);
+      }
+    );
   };
   
   const serviceTypeOptions = [
