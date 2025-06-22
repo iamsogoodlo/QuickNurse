@@ -130,6 +130,7 @@ This uses `concurrently` to start the API server in `api/` and the Vite dev serv
 ## Troubleshooting
 
 *   **`sh: vite: command not found` (Frontend):** Make sure you have run `npm install` in your frontend project directory.
+*   **Blank screen after pulling updates:** New dependencies may have been added. Run `npm install` again in the frontend folder to ensure all packages are installed. This is often required if the patient dashboard page appears completely blank after a pull.
 *   **`Error: Cannot find module './db/connection'` (Backend):** Ensure the file `quicknurse-api/db/connection.js` exists and is correctly placed. Also, check that `server.js` is trying to import it correctly.
 *   **"Failed to fetch" errors in browser:**
     *   Verify your backend API server is running (check its terminal window).

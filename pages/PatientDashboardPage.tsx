@@ -1,50 +1,44 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import FindNursesPanel from '../components/dashboard/patient/FindNursesPanel';
-// import MyRequestsPanel from '../components/dashboard/patient/MyRequestsPanel'; // Placeholder for future
+import UserLocationMap from '../components/common/UserLocationMap';
+import { useAuth } from '../hooks/useAuth';
+import { PatientProfile } from '../types';
 
 const PatientDashboardPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'find' | 'requests'>('find');
+  const { user } = useAuth();
+  const patient = user as PatientProfile | null;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Patient Dashboard</h1>
-      
-      <div className="mb-6 border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-          <button
-            onClick={() => setActiveTab('find')}
-            className={`${
-              activeTab === 'find'
-                ? 'border-teal-500 text-teal-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-          >
-            Find a Nurse
-          </button>
-          {/* <button
-            onClick={() => setActiveTab('requests')}
-            className={`${
-              activeTab === 'requests'
-                ? 'border-teal-500 text-teal-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-          >
-            My Service Requests
-          </button> */}
-          {/* Placeholder for My Requests Tab */}
-           <button
-            disabled
-            className="border-transparent text-gray-400 cursor-not-allowed whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-          >
-            My Service Requests (Coming Soon)
-          </button>
-        </nav>
-      </div>
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Patient Dashboard</h1>
 
-      <div>
-        {activeTab === 'find' && <FindNursesPanel />}
-        {/* {activeTab === 'requests' && <MyRequestsPanel />} */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="space-y-6">
+          <div className="bg-white rounded-2xl shadow p-6 text-center">
+            <h2 className="text-lg font-semibold mb-2">Welcome{patient ? `, ${patient.first_name}` : ''}</h2>
+            <p className="text-sm text-gray-600">Need care? Use the form to find a nurse.</p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow p-6">
+            <h2 className="text-lg font-semibold mb-4">Account Stats</h2>
+            <p className="text-sm text-gray-600">Total Requests: {patient?.total_requests ?? 0}</p>
+            <p className="text-sm text-gray-600">Completed Visits: {patient?.completed_visits ?? 0}</p>
+            <p className="text-sm text-gray-600">Total Spent: ${patient?.total_spent?.toFixed(2) ?? '0.00'}</p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow p-6">
+            <h2 className="text-lg font-semibold mb-4">Your Location</h2>
+            <UserLocationMap
+              latitude={patient?.address.coordinates?.[1]}
+              longitude={patient?.address.coordinates?.[0]}
+            />
+          </div>
+        </div>
+
+        <div className="lg:col-span-2">
+          <FindNursesPanel />
+        </div>
       </div>
     </div>
   );
