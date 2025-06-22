@@ -29,6 +29,7 @@ const FindNursesPanel: React.FC = () => {
   const { token, user, userType } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [modalServiceType, setModalServiceType] = useState<string>('general');
+  const [selectedNurse, setSelectedNurse] = useState<NearbyNurse | null>(null);
 
 
   useEffect(() => {
@@ -209,7 +210,15 @@ const FindNursesPanel: React.FC = () => {
               <h3 className="text-lg font-medium text-gray-700 mb-4">Available Nurses ({nurses.length})</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-x-6 gap-y-8"> {/* Adjusted for potentially 2 cards per row on larger screens in this layout */}
                 {nurses.map(nurse => (
-                  <NurseCard key={nurse.nurse_id} nurse={nurse} onRequest={() => { setModalServiceType(serviceType); setShowModal(true); }} />
+                  <NurseCard
+                    key={nurse.nurse_id}
+                    nurse={nurse}
+                    onRequest={(n) => {
+                      setSelectedNurse(n);
+                      setModalServiceType(serviceType);
+                      setShowModal(true);
+                    }}
+                  />
                 ))}
               </div>
             </div>
@@ -224,8 +233,9 @@ const FindNursesPanel: React.FC = () => {
       </div>
       <RequestServiceModal
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={() => { setShowModal(false); setSelectedNurse(null); }}
         defaultServiceType={modalServiceType}
+        nurse={selectedNurse}
       />
     </div>
   );
