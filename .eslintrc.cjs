@@ -1,5 +1,4 @@
 module.exports = {
-  root: true,
   ignorePatterns: ['node_modules', 'dist', 'api/node_modules'],
   env: { browser: true, node: true, es2020: true },
   parser: '@typescript-eslint/parser',
