@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Button from '../../common/Button';
 import Input from '../../common/Input';
-import UserLocationMap from '../../common/UserLocationMap';
+import PatientNurseMap from '../../common/PatientNurseMap';
 import { useAuth } from '../../../hooks/useAuth';
 import { createOrder } from '../../../services/orderService';
 import { ApiError, PatientProfile, NearbyNurse } from '../../../types';
@@ -15,6 +15,8 @@ interface Props {
 
 const RequestServiceModal: React.FC<Props> = ({ isOpen, onClose, defaultServiceType, nurse }) => {
   const { user, token, userType } = useAuth();
+  const patient = userType === 'patient' && user ? (user as PatientProfile) : null;
+  const patientCoords = patient?.address.coordinates;
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -62,11 +64,11 @@ const RequestServiceModal: React.FC<Props> = ({ isOpen, onClose, defaultServiceT
             {message}
           </div>
         )}
-        {orderPlaced && nurse && (
+        {orderPlaced && nurse && patientCoords && (
           <div className="mb-4">
-            <UserLocationMap
-              latitude={nurse.location.coordinates[1]}
-              longitude={nurse.location.coordinates[0]}
+            <PatientNurseMap
+              patient={{ lat: patientCoords[1], lng: patientCoords[0] }}
+              nurse={{ lat: patientCoords[1] + 0.0001, lng: patientCoords[0] + 0.0001 }}
             />
             <div className="flex justify-end pt-4">
               <Button type="button" variant="primary" onClick={onClose}>Close</Button>
