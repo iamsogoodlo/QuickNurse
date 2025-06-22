@@ -84,6 +84,9 @@ export interface PatientProfile {
   medical_conditions?: string[];
   allergies?: string[];
   emergency_contacts?: Array<{ name: string; relationship: string; phone: string }>;
+  total_requests?: number;
+  completed_visits?: number;
+  total_spent?: number;
   account_status: 'active' | 'inactive' | 'suspended';
 }
 
