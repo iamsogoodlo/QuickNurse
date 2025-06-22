@@ -13,13 +13,21 @@ const orderReceivedSchema = new mongoose.Schema({
     estimatedEndTime: Date
   },
   location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point'
+    },
+    coordinates: {
+      type: [Number],
+      required: true
+    },
     address: {
       street: String,
       city: String,
       state: String,
       zipCode: String
     },
-    coordinates: { type: [Number], index: '2dsphere' },
     locationType: String
   },
   requirements: {

@@ -66,6 +66,15 @@ The backend now defines four main MongoDB collections:
     ```
     The API server should start, typically on `http://localhost:5001`. Look for console messages indicating a successful database connection and server startup. Keep this terminal window open.
 
+5.  **Seed the Database with Test Accounts (Run Once):**
+    Populate MongoDB with sample nurses and patients so you can log in immediately. You can run the seed command from the project root (it forwards to the API folder) **or** from inside `quicknurse-api`:
+    ```bash
+    npm run seed            # from the project root
+    # or
+    cd quicknurse-api && npm run seed
+    ```
+    The script prints each email/password combination. Use these credentials when testing logins.
+
 ## Frontend Setup (`quicknurse-frontend` or your frontend root)
 
 Your frontend is built using Vite.
@@ -125,6 +134,7 @@ This uses `concurrently` to start the API server in `api/` and the Vite dev serv
     *   Verify your internet connection.
     *   Ensure your IP is whitelisted in MongoDB Atlas.
     *   If `npm install` fails with ETARGET errors for multer, ensure your `api/package.json` uses `multer` version `^1.4.5-lts.2`.
+*   **"Invalid credentials" when logging in:** Make sure the seed script completed successfully. It hashes passwords before saving, so if you inserted your own data manually, the passwords may not be hashed. Re-run `npm run seed` in the `api` directory and try again.
 
 This README should help you and others get the project running smoothly.
 
@@ -158,15 +168,7 @@ All accounts share a fixed location near Times Square in New York City so you ca
 
 ## Example End-to-End Demo
 
-Follow these steps to simulate a patient creating a service request and a nurse accepting it using the API directly.
-
 1. **Start the servers** (after running the seed command above):
-
-   ```bash
-   npm run dev:all
-   ```
-
-2. **Log in as a patient** to obtain a JWT and the `patient_id`:
 
    ```bash
    curl -X POST http://localhost:5001/api/auth/patient/login \
@@ -176,24 +178,17 @@ Follow these steps to simulate a patient creating a service request and a nurse 
 
    Copy the `token` and `patient.patient_id` values from the JSON response.
 
-3. **Create a service order** using the patient token and id:
 
    ```bash
    curl -X POST http://localhost:5001/api/orders \
      -H 'Content-Type: application/json' \
      -H "Authorization: Bearer PATIENT_TOKEN" \
-     -d '{"orderId":"demo_order1","patientId":"PATIENT_ID","serviceDetails":{"serviceType":"wound_care","description":"Demo visit"},"location":{"address":{"street":"123 Main St","city":"New York","state":"NY","zipCode":"10001"},"coordinates":[-73.9855,40.7580],"locationType":"home"}}'
-   ```
-
-4. **Log in as a nurse** and capture the `nurse_id` and token:
 
    ```bash
    curl -X POST http://localhost:5001/api/auth/nurse/login \
      -H 'Content-Type: application/json' \
      -d '{"email":"nurse1@example.com","password":"nursepass"}'
    ```
-
-5. **Accept the order** using the nurse token and id:
 
    ```bash
    curl -X PUT http://localhost:5001/api/orders/demo_order1/accept \
@@ -203,4 +198,3 @@ Follow these steps to simulate a patient creating a service request and a nurse 
    ```
 
 The response will show the order marked as `accepted`, demonstrating the end-to-end interaction without relying on the unfinished frontend pages.
-
