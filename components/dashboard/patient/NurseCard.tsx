@@ -5,6 +5,7 @@ import Button from '../../common/Button';
 
 interface NurseCardProps {
   nurse: NearbyNurse;
+  onRequest?: (nurse: NearbyNurse) => void;
 }
 
 const StarIcon: React.FC<{ filled: boolean }> = ({ filled }) => (
@@ -14,11 +15,11 @@ const StarIcon: React.FC<{ filled: boolean }> = ({ filled }) => (
 );
 
 
-const NurseCard: React.FC<NurseCardProps> = ({ nurse }) => {
+const NurseCard: React.FC<NurseCardProps> = ({ nurse, onRequest }) => {
   const handleRequestService = () => {
-    // Placeholder for service request functionality
-    alert(`Service request for ${nurse.first_name} ${nurse.last_name} initiated (not implemented yet).`);
-    // In a real app, this would open a modal or navigate to a request page
+    if (onRequest) {
+      onRequest(nurse);
+    }
   };
 
   const renderStars = (rating: number) => {
