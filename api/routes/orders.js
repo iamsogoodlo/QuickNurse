@@ -1,6 +1,7 @@
 const express = require('express');
 const OrderReceived = require('../models/OrderReceived');
 const OrderFulfilled = require('../models/OrderFulfilled');
+const Patient = require('../models/Patient');
 const router = express.Router();
 
 // POST /api/orders - create new order (received)
@@ -9,6 +10,10 @@ router.post('/', async (req, res) => {
     const data = req.body;
     const order = new OrderReceived(data);
     await order.save();
+    await Patient.findOneAndUpdate(
+      { patient_id: data.patientId },
+      { last_placed_order: new Date() }
+    );
     res.status(201).json({ success: true, data: order });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

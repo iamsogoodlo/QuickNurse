@@ -11,9 +11,10 @@ interface Props {
   onClose: () => void;
   defaultServiceType: string;
   nurse?: NearbyNurse | null;
+  onOrderPlaced?: (nurse: NearbyNurse) => void;
 }
 
-const RequestServiceModal: React.FC<Props> = ({ isOpen, onClose, defaultServiceType, nurse }) => {
+const RequestServiceModal: React.FC<Props> = ({ isOpen, onClose, defaultServiceType, nurse, onOrderPlaced }) => {
   const { user, token, userType } = useAuth();
   const patient = userType === 'patient' && user ? (user as PatientProfile) : null;
   const patientCoords = patient?.address.coordinates;
@@ -26,7 +27,7 @@ const RequestServiceModal: React.FC<Props> = ({ isOpen, onClose, defaultServiceT
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (userType !== 'patient' || !user || !token) return;
+    if (userType !== 'patient' || !user || !token || !nurse) return;
     const patient = user as PatientProfile;
     setIsSubmitting(true);
     const payload = {
@@ -50,6 +51,9 @@ const RequestServiceModal: React.FC<Props> = ({ isOpen, onClose, defaultServiceT
     if (res.success && res.data) {
       setMessage('Order placed!');
       setOrderPlaced(true);
+      if (onOrderPlaced) {
+        onOrderPlaced(nurse);
+      }
     } else {
       setMessage((res.error as ApiError)?.message || 'Failed to create order');
     }
@@ -68,7 +72,10 @@ const RequestServiceModal: React.FC<Props> = ({ isOpen, onClose, defaultServiceT
           <div className="mb-4">
             <PatientNurseMap
               patient={{ lat: patientCoords[1], lng: patientCoords[0] }}
-              nurse={{ lat: patientCoords[1] + 0.0001, lng: patientCoords[0] + 0.0001 }}
+              nurse={{
+                lat: nurse.location.coordinates[1],
+                lng: nurse.location.coordinates[0],
+              }}
             />
             <div className="flex justify-end pt-4">
               <Button type="button" variant="primary" onClick={onClose}>Close</Button>

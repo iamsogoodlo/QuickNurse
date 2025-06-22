@@ -11,6 +11,7 @@ import NurseCard from './NurseCard';
 import { NURSE_SPECIALTY_OPTIONS, CA_PROVINCES } from '../../../constants';
 import RequestServiceModal from './RequestServiceModal';
 import UserLocationMap from '../../common/UserLocationMap';
+import PatientNurseMap from '../../common/PatientNurseMap';
 import { geocodeAddress, reverseGeocode } from '../../../services/geocodingService';
 
 const FindNursesPanel: React.FC = () => {
@@ -30,6 +31,7 @@ const FindNursesPanel: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalServiceType, setModalServiceType] = useState<string>('general');
   const [selectedNurse, setSelectedNurse] = useState<NearbyNurse | null>(null);
+  const [orderPlacedWith, setOrderPlacedWith] = useState<NearbyNurse | null>(null);
 
 
   useEffect(() => {
@@ -201,6 +203,26 @@ const FindNursesPanel: React.FC = () => {
             <UserLocationMap latitude={coords?.lat} longitude={coords?.lng} />
           </div>
 
+          {orderPlacedWith && coords && (
+            <div className="mb-6">
+              <div className="p-3 mb-2 bg-teal-50 text-teal-700 text-center rounded">
+                Order placed successfully!
+              </div>
+              <PatientNurseMap
+                patient={{ lat: coords.lat, lng: coords.lng }}
+                nurse={{
+                  lat: orderPlacedWith.location.coordinates[1],
+                  lng: orderPlacedWith.location.coordinates[0],
+                }}
+              />
+              <div className="flex justify-end pt-2">
+                <Button variant="primary" onClick={() => setOrderPlacedWith(null)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+
           {error && <div className="p-3 mb-4 bg-red-100 text-red-700 border border-red-300 rounded-md text-sm">{error}</div>}
           
           {isLoading && <div className="flex justify-center py-8"><LoadingSpinner /></div>}
@@ -236,6 +258,11 @@ const FindNursesPanel: React.FC = () => {
         onClose={() => { setShowModal(false); setSelectedNurse(null); }}
         defaultServiceType={modalServiceType}
         nurse={selectedNurse}
+        onOrderPlaced={(n) => {
+          setOrderPlacedWith(n);
+          setShowModal(false);
+          setSelectedNurse(null);
+        }}
       />
     </div>
   );
