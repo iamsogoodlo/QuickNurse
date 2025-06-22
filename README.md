@@ -96,6 +96,16 @@ Your frontend is built using Vite.
     ```
     The Vite development server will start, typically on `http://localhost:5173` (or the next available port). Open this URL in your web browser.
 
+## Combined Development Mode
+
+After the initial setup you can run both the backend and frontend together from the repository root:
+
+```bash
+npm run dev:all
+```
+
+This uses `concurrently` to start the API server in `api/` and the Vite dev server so you can develop in one terminal window.
+
 ## Using the Application
 
 *   Ensure both the backend API server and the frontend Vite development server are running.
