@@ -2,6 +2,7 @@
   "name": "quicknurse-on-demand-nursing-care",
   "private": true,
   "version": "0.0.0",
+  "main": "electron.js",
   "type": "module",
   "scripts": {
     "dev": "vite",

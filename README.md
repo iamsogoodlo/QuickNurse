@@ -100,6 +100,9 @@ Your frontend is built using Vite.
 This repository now includes a minimal Electron wrapper so the React app can be
 packaged as a desktop executable:
 
+0.  Ensure your `package.json` has `"main": "electron.js"` so Electron knows
+    which file to launch (this repo already sets it).
+
 1.  Install dependencies (if you haven't already):
     ```bash
     npm install
