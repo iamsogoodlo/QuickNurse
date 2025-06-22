@@ -120,7 +120,22 @@ packaged as a desktop executable:
     ```bash
     npm run package-win
     ```
+
     The generated executable will be placed in the `dist-electron/` folder.
+
+## Deploying to GoDaddy (quicknurse.ca)
+
+To host QuickNurse on your GoDaddy domain, use a plan that supports Node.js or a VPS:
+
+1. **Upload the code** – Copy both the backend (`api` directory) and frontend files to your server via FTP, Git, or GoDaddy's file manager.
+2. **Install dependencies** – On the server, run `npm install` inside the project root and again inside `api/`.
+3. **Configure environment variables** – Create `api/.env` with `MONGODB_URI`, `JWT_SECRET`, and `PORT` values.
+4. **Build the frontend** – In the root, run `npm run build` to generate the `dist/` folder.
+5. **Serve with Node** – Modify `api/server.js` (or your Express server) to serve the `dist/` folder using `express.static` so both API and static files share the same server.
+6. **Use a process manager** – Start the backend with `pm2` or similar to keep the Node app running.
+7. **Update DNS** – Point `quicknurse.ca` to your server's IP (or CNAME) in GoDaddy's DNS manager.
+
+Once DNS propagation completes, navigating to `https://quicknurse.ca` should load the application.
 
 ## Troubleshooting
 
