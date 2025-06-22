@@ -19,6 +19,13 @@ The platform now supports real-time nurse location tracking, photo-based documen
 verification, and fixed pricing with distance and time surcharges. Nurses can
 view monthly revenue, jobs taken, and ratings directly on their dashboard.
 
+### Database Collections
+The backend now defines four main MongoDB collections:
+* **Nurses** – registered caregivers and their availability
+* **Patients** – user profiles and medical details
+* **OrdersReceived** – incoming service requests awaiting fulfillment
+* **OrdersFulfilled** – records of completed or cancelled visits
+
 ## Prerequisites
 
 *   Node.js (v18 or later recommended) and npm
@@ -113,3 +120,28 @@ This README should help you and others get the project running smoothly.
 
 ## Nurse Dashboard Prototype
 A prototype HTML dashboard is available in `nurse-dashboard.html` with placeholders for real-time features.
+
+## Mock Testing Setup
+
+For development without a real backend, a mock database is included in the `mock` directory. It defines clusters of doctors and patients around New York City. Use the **Test Mode** button on the authentication page to quickly log in as any test user. The mock API found in `mock/mockApi.ts` simulates fetching nearby doctors and creating orders.
+
+## Database Test Seed
+
+You can populate your MongoDB instance with a few predefined nurses and patients. Run the following from the `api` directory:
+
+```bash
+npm run seed
+```
+
+The script prints the credentials for each account. Default logins are:
+
+**Nurses**
+- `nurse1@example.com` / `nursepass`
+- `nurse2@example.com` / `nursepass`
+- `nurse3@example.com` / `nursepass`
+
+**Patients**
+- `patient1@example.com` / `patientpass`
+- `patient2@example.com` / `patientpass`
+
+All accounts share a fixed location near Times Square in New York City so you can reliably test nearby search and booking features.

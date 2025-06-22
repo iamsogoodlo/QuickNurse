@@ -5,6 +5,7 @@ import PatientLoginForm from '../components/auth/PatientLoginForm';
 import PatientRegisterForm from '../components/auth/PatientRegisterForm';
 import NurseLoginForm from '../components/auth/NurseLoginForm';
 import NurseRegisterForm from '../components/auth/NurseRegisterForm';
+import TestLoginPanel from '../components/auth/TestLoginPanel';
 import { useAuth } from '../hooks/useAuth';
 
 type AuthMode = 'login' | 'register';
@@ -89,6 +90,7 @@ const AuthPage: React.FC = () => {
           )}
         </div>
       </div>
+      <TestLoginPanel />
     </div>
   );
 };

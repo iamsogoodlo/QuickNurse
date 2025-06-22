@@ -6,8 +6,7 @@ import { LicenseType, NurseSpecialty, NurseCertification, NurseStatus } from './
 // Fallback to localhost for local development.
 export const API_BASE_URL =
   (typeof import.meta !== 'undefined' &&
-    (import.meta as any).env &&
-    (import.meta as any).env.VITE_API_BASE_URL) ||
+    (import.meta as { env?: Record<string, string> }).env?.VITE_API_BASE_URL) ||
   'http://localhost:5001/api';
 
 export const AUTH_ENDPOINTS = {
@@ -39,10 +38,8 @@ export const NURSE_SPECIALTY_OPTIONS = Object.values(NurseSpecialty);
 export const NURSE_CERTIFICATION_OPTIONS = Object.values(NurseCertification);
 export const NURSE_STATUS_OPTIONS = Object.values(NurseStatus);
 
-export const US_STATES = [
-  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
-  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
-  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
-  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
-  'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
+// Canadian provinces and territories
+export const CA_PROVINCES = [
+  'AB', 'BC', 'MB', 'NB', 'NL', 'NT', 'NS', 'NU', 'ON',
+  'PE', 'QC', 'SK', 'YT'
 ];

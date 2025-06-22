@@ -3,7 +3,7 @@ import { ApiResponse, ApiError } from '../types';
 
 export async function handleApiResponse<T>(response: Response): Promise<ApiResponse<T>> {
   if (!response.ok) {
-    let errorData: ApiError = { message: `HTTP error! status: ${response.status}` };
+    const errorData: ApiError = { message: `HTTP error! status: ${response.status}` };
     try {
       const parsedError = await response.json();
       // Backend error format is { success: false, error: 'message' }
@@ -34,25 +34,33 @@ export async function handleApiResponse<T>(response: Response): Promise<ApiRespo
 export async function apiService<T>(
   url: string,
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET',
-  body?: any,
+  body?: unknown,
   token?: string | null
 ): Promise<ApiResponse<T>> {
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
+  const headers: HeadersInit = {};
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
   }
 
   try {
     const response = await fetch(url, {
       method,
       headers,
-      body: body ? JSON.stringify(body) : undefined,
+      body: body
+        ? isFormData
+          ? (body as FormData)
+          : JSON.stringify(body)
+        : undefined,
     });
     return handleApiResponse<T>(response);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Network error or request failed';
     console.error(`API call failed for ${method} ${url}:`, error);
-    return { success: false, error: { message: error.message || 'Network error or request failed' } };
+    return { success: false, error: { message } };
   }
 }

@@ -11,7 +11,8 @@ const documentRoutes = require('./routes/documents');
 const nurseRequestRoutes = require('./routes/nurse-requests');
 // Add other route imports here if you create them:
 // const patientRoutes = require('./routes/patients');
-// const serviceRequestRoutes = require('./routes/serviceRequests');
+const serviceRequestRoutes = require('./routes/serviceRequests');
+const ordersRoutes = require('./routes/orders');
 
 
 const app = express();
@@ -31,7 +32,8 @@ app.use('/api/tracking', trackingRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/requests', nurseRequestRoutes);
 // app.use('/api/patients', patientRoutes); // Example for future
-// app.use('/api/servicerequests', serviceRequestRoutes); // Example for future
+app.use('/api/servicerequests', serviceRequestRoutes);
+app.use('/api/orders', ordersRoutes);
 
 // Simple root route for health check or API info
 app.get('/', (req, res) => {
@@ -39,7 +41,7 @@ app.get('/', (req, res) => {
 });
 
 // Basic Error Handling Middleware (Keep this last before app.listen)
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   console.error(err.stack);
   res.status(500).send({ success: false, error: 'Something broke on the server!' });
 });

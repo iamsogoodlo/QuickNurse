@@ -1,12 +1,11 @@
-
 import { apiService } from './api';
-import { NURSE_ENDPOINTS } from '../constants';
+import { NURSE_ENDPOINTS, API_BASE_URL } from '../constants';
 import { ApiResponse, NearbyNurse, NurseProfile, NurseStatus, NurseDashboardStats } from '../types';
 
 export const findNearbyNurses = async (
-  lat: number, 
-  lng: number, 
-  radius: number = 15, 
+  lat: number,
+  lng: number,
+  radius: number = 15,
   specialty?: string,
   service_type: string = 'general',
   token?: string | null
@@ -36,8 +35,15 @@ export const updateNurseStatus = async (
 };
 
 export const getNurseProfile = async (token: string): Promise<ApiResponse<NurseProfile>> => {
-    // Assumed endpoint, not in provided backend code
-    return apiService<NurseProfile>(NURSE_ENDPOINTS.PROFILE, 'GET', undefined, token);
+  // Assumed endpoint, not in provided backend code
+  return apiService<NurseProfile>(NURSE_ENDPOINTS.PROFILE, 'GET', undefined, token);
+};
+
+export const updateNurseProfile = async (
+  profileData: Partial<NurseProfile>,
+  token: string
+): Promise<ApiResponse<NurseProfile>> => {
+  return apiService<NurseProfile>(NURSE_ENDPOINTS.PROFILE, 'PUT', profileData, token);
 };
 
 export const getNurseDashboard = async (
@@ -46,4 +52,21 @@ export const getNurseDashboard = async (
 ): Promise<ApiResponse<NurseDashboardStats>> => {
   const url = `${NURSE_ENDPOINTS.DASHBOARD}?nurse_id=${nurseId}`;
   return apiService<NurseDashboardStats>(url, 'GET', undefined, token);
+};
+
+export const uploadNurseDocument = async (
+  nurseId: string,
+  documentType: string,
+  file: File,
+  token: string
+): Promise<ApiResponse<unknown>> => {
+  const formData = new FormData();
+  formData.append('document_type', documentType);
+  formData.append('document', file);
+  return apiService<unknown>(
+    `${API_BASE_URL}/documents/nurse/${nurseId}/upload`,
+    'POST',
+    formData,
+    token
+  );
 };

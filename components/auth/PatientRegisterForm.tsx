@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { registerPatient } from '../../services/authService';
 import Input from '../common/Input';
 import Button from '../common/Button';
-import { US_STATES } from '../../constants';
+import { CA_PROVINCES } from '../../constants';
 import Select from '../common/Select';
 import { ApiError } from '../../types';
 
@@ -36,7 +36,7 @@ const PatientRegisterForm: React.FC = () => {
     address: {
       street: '',
       city: '',
-      state: US_STATES[0],
+      state: CA_PROVINCES[0],
       zip_code: '',
     }
   });
@@ -121,7 +121,7 @@ const PatientRegisterForm: React.FC = () => {
             zip_code: formData.address.zip_code,
         }
     };
-    const { confirmPassword, ...apiData } = submissionData;
+    const { confirmPassword: _confirmPassword, ...apiData } = submissionData;
 
     const response = await registerPatient(apiData);
     setIsLoading(false);
@@ -166,7 +166,7 @@ const PatientRegisterForm: React.FC = () => {
             isRequired
             value={formData.address.state}
             onChange={handleChange}
-            options={US_STATES.map(s => ({ value: s, label: s }))}
+            options={CA_PROVINCES.map(s => ({ value: s, label: s }))}
             error={errors["address.state"]}
         />
         <Input id="address.zip_code" label="Zip Code" name="address.zip_code" required isRequired value={formData.address.zip_code} onChange={handleChange} error={errors["address.zip_code"]} />
