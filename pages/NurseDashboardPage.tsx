@@ -4,6 +4,7 @@ import { ServiceRequestSummaryForNurse, OrderReceived, NurseProfile } from '../t
 import { getPendingOrders, acceptOrder } from '../services/orderService';
 import { useAuth } from '../hooks/useAuth';
 import UserLocationMap from '../components/common/UserLocationMap';
+import PatientNurseMap from '../components/common/PatientNurseMap';
 
 const mapOrderToSummary = (order: OrderReceived): ServiceRequestSummaryForNurse => ({
   request_id: order.orderId,
@@ -21,6 +22,8 @@ const NurseDashboardPage: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [nearbyRequests, setNearbyRequests] = useState<ServiceRequestSummaryForNurse[]>([]);
   const [activeRequest, setActiveRequest] = useState<ServiceRequestSummaryForNurse | null>(null);
+  const [activeOrder, setActiveOrder] = useState<OrderReceived | null>(null);
+  const [nurseLocation, setNurseLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   const toggleOnline = () => setIsOnline((prev) => !prev);
 
@@ -34,11 +37,20 @@ const NurseDashboardPage: React.FC = () => {
     load();
   }, []);
 
+  useEffect(() => {
+    if (activeOrder && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((p) => {
+        setNurseLocation({ lat: p.coords.latitude, lng: p.coords.longitude });
+      });
+    }
+  }, [activeOrder]);
+
   const handleAccept = async (id: string) => {
     if (!token || !user) return;
     const res = await acceptOrder(id, (user as NurseProfile).nurse_id, token);
     if (res.success && res.data) {
       setActiveRequest(mapOrderToSummary(res.data));
+      setActiveOrder(res.data);
       setNearbyRequests(nearbyRequests.filter((r) => r.request_id !== id));
     }
   };
@@ -81,15 +93,30 @@ const NurseDashboardPage: React.FC = () => {
         </div>
 
         <div className="lg:col-span-2 space-y-6">
-          {activeRequest && (
+          {activeRequest && activeOrder && (
             <div className="bg-white rounded-2xl shadow p-6">
               <h2 className="text-lg font-semibold mb-2">Current Request</h2>
-              <p className="text-gray-600 mb-2">{activeRequest.service_type}</p>
+              <p className="text-gray-600 mb-4">{activeRequest.service_type}</p>
+              <PatientNurseMap
+                patient={{
+                  lat: activeOrder.location.coordinates[1],
+                  lng: activeOrder.location.coordinates[0],
+                }}
+                nurse={
+                  nurseLocation ?? {
+                    lat: activeOrder.location.coordinates[1] + 0.0001,
+                    lng: activeOrder.location.coordinates[0] + 0.0001,
+                  }
+                }
+              />
               <button
-                onClick={() => setActiveRequest(null)}
-                className="mt-2 px-4 py-2 bg-indigo-600 text-white rounded"
+                onClick={() => {
+                  setActiveRequest(null);
+                  setActiveOrder(null);
+                }}
+                className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded"
               >
-                Complete
+                Close Order
               </button>
             </div>
           )}
