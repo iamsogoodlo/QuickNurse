@@ -131,7 +131,25 @@ export interface NearbyNurse {
     platformFee: number;
     breakdown: PricingBreakdown;
   };
-  distance: number; 
+  distance: number;
+}
+
+export interface ServiceRequest {
+  request_id: string;
+  patient_id: string;
+  nurse_id?: string;
+  service_type: string;
+  patient_location: { type: 'Point'; coordinates: [number, number] };
+  patient_address?: Address;
+  service_base_price: number;
+  distance_fee?: number;
+  urgency_surcharge?: number;
+  time_surcharge?: number;
+  total_price: number;
+  nurse_earnings: number;
+  platform_fee: number;
+  status: string;
+  requested_at: string;
 }
 
 export interface ServiceRequestSummaryForNurse {

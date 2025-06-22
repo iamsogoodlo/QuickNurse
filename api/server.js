@@ -15,6 +15,9 @@ const serviceRequestRoutes = require('./routes/serviceRequests');
 const ordersRoutes = require('./routes/orders');
 
 
+const http = require('http');
+const socket = require('./socket');
+
 const app = express();
 
 // Connect to Database
@@ -47,6 +50,9 @@ app.use((err, req, res) => {
 });
 
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
+const server = http.createServer(app);
+socket.init(server);
+
+server.listen(PORT, () => {
   console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
 });

@@ -144,4 +144,4 @@ The script prints the credentials for each account. Default logins are:
 - `patient1@example.com` / `patientpass`
 - `patient2@example.com` / `patientpass`
 
-All accounts share a fixed location near Times Square in New York City so you can reliably test nearby search and booking features.
+All accounts share a fixed location near Times Square in New York City so you can reliably test nearby search and booking features. The seeded nurses are marked as **verified**, **active**, and **online** so they will appear in search results immediately.

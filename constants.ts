@@ -9,6 +9,8 @@ export const API_BASE_URL =
     (import.meta as { env?: Record<string, string> }).env?.VITE_API_BASE_URL) ||
   'http://localhost:5001/api';
 
+export const SOCKET_BASE_URL = API_BASE_URL.replace(/\/api$/, '');
+
 export const AUTH_ENDPOINTS = {
   NURSE_REGISTER: API_BASE_URL + '/auth/nurse/register',
   NURSE_LOGIN: API_BASE_URL + '/auth/nurse/login',
