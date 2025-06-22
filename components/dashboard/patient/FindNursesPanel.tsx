@@ -9,6 +9,7 @@ import Select from '../../common/Select';
 import LoadingSpinner from '../../common/LoadingSpinner';
 import NurseCard from './NurseCard';
 import { NURSE_SPECIALTY_OPTIONS } from '../../../constants';
+import RequestServiceModal from './RequestServiceModal';
 import { MapPinIcon } from '@heroicons/react/24/outline'; // For map placeholder
 
 const FindNursesPanel: React.FC = () => {
@@ -22,6 +23,8 @@ const FindNursesPanel: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { token, user, userType } = useAuth();
+  const [showModal, setShowModal] = useState(false);
+  const [modalServiceType, setModalServiceType] = useState<string>('general');
 
   useEffect(() => {
     if (userType === 'patient' && user) {
@@ -155,7 +158,7 @@ const FindNursesPanel: React.FC = () => {
               <h3 className="text-lg font-medium text-gray-700 mb-4">Available Nurses ({nurses.length})</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-x-6 gap-y-8"> {/* Adjusted for potentially 2 cards per row on larger screens in this layout */}
                 {nurses.map(nurse => (
-                  <NurseCard key={nurse.nurse_id} nurse={nurse} />
+                  <NurseCard key={nurse.nurse_id} nurse={nurse} onRequest={() => { setModalServiceType(serviceType); setShowModal(true); }} />
                 ))}
               </div>
             </div>
@@ -168,6 +171,11 @@ const FindNursesPanel: React.FC = () => {
           )}
         </div>
       </div>
+      <RequestServiceModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        defaultServiceType={modalServiceType}
+      />
     </div>
   );
 };
