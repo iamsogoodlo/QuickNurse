@@ -14,6 +14,11 @@ const nurseData = [
     license_state: 'NY',
     license_type: 'RN',
     years_experience: 5,
+    specialties: ['general', 'wound_care'],
+    account_status: 'active',
+    verification_status: 'verified',
+    is_online: true,
+    current_status: 'available',
     general_location: { type: 'Point', coordinates: [-73.9855, 40.7580], accuracy: 50 },
     precise_location: { type: 'Point', coordinates: [-73.9855, 40.7580], accuracy: 10 }
   },
@@ -27,6 +32,11 @@ const nurseData = [
     license_state: 'NY',
     license_type: 'RN',
     years_experience: 4,
+    specialties: ['general', 'pediatric'],
+    account_status: 'active',
+    verification_status: 'verified',
+    is_online: true,
+    current_status: 'available',
     general_location: { type: 'Point', coordinates: [-73.9820, 40.7590], accuracy: 50 },
     precise_location: { type: 'Point', coordinates: [-73.9820, 40.7590], accuracy: 10 }
   },
@@ -40,6 +50,11 @@ const nurseData = [
     license_state: 'NY',
     license_type: 'RN',
     years_experience: 7,
+    specialties: ['general', 'iv_therapy'],
+    account_status: 'active',
+    verification_status: 'verified',
+    is_online: true,
+    current_status: 'available',
     general_location: { type: 'Point', coordinates: [-73.9900, 40.7570], accuracy: 50 },
     precise_location: { type: 'Point', coordinates: [-73.9900, 40.7570], accuracy: 10 }
   }
