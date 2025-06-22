@@ -27,7 +27,7 @@ const UserLocationMap: React.FC<Props> = ({ latitude, longitude }) => {
   const center: GoogleLatLng = position || { lat: 37.7749, lng: -122.4194 };
 
   return (
-    <LoadScript googleMapsApiKey={(import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY || ''}>
+    <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''}>
       <GoogleMap mapContainerStyle={{ height: '250px', width: '100%' }} center={center} zoom={13}>
         {position && <Marker position={position} />}
       </GoogleMap>

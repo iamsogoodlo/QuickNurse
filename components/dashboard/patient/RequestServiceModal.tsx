@@ -23,7 +23,6 @@ const RequestServiceModal: React.FC<Props> = ({ isOpen, onClose, defaultServiceT
     e.preventDefault();
     if (userType !== 'patient' || !user || !token) return;
     const patient = user as PatientProfile;
-    }
     setIsSubmitting(true);
     const payload = {
       orderId: `order_${Date.now()}`,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TEST_USERS } from '../../mock/testUsers';
 import { useAuth } from '../../hooks/useAuth';
+import { AuthResponseData, NurseStatus } from '../../types';
 
 interface TestUser {
   id: string;
@@ -14,8 +15,33 @@ const TestLoginPanel: React.FC = () => {
   const { login } = useAuth();
 
   const loginAs = (user: TestUser, type: 'patient' | 'nurse') => {
-    // Minimal authentication simulation
-    login({ token: 'mock-token', [type]: { id: user.id, name: user.name } } as any, type as any);
+    const [firstName, ...lastNameParts] = user.name.split(' ');
+    const lastName = lastNameParts.join(' ') || 'User';
+
+    const data: AuthResponseData = { token: 'mock-token' };
+
+    if (type === 'patient') {
+      data.patient = {
+        patient_id: user.id,
+        first_name: firstName,
+        last_name: lastName,
+        email: `${user.id}@example.com`,
+        account_status: 'active',
+      };
+    } else {
+      data.nurse = {
+        nurse_id: user.id,
+        first_name: firstName,
+        last_name: lastName,
+        email: `${user.id}@example.com`,
+        account_status: 'active',
+        verification_status: 'verified',
+        is_online: true,
+        current_status: (user.status as NurseStatus) || NurseStatus.AVAILABLE,
+      };
+    }
+
+    login(data, type);
   };
 
   return (
