@@ -124,3 +124,24 @@ A prototype HTML dashboard is available in `nurse-dashboard.html` with placehold
 ## Mock Testing Setup
 
 For development without a real backend, a mock database is included in the `mock` directory. It defines clusters of doctors and patients around New York City. Use the **Test Mode** button on the authentication page to quickly log in as any test user. The mock API found in `mock/mockApi.ts` simulates fetching nearby doctors and creating orders.
+
+## Database Test Seed
+
+You can populate your MongoDB instance with a few predefined nurses and patients. Run the following from the `api` directory:
+
+```bash
+npm run seed
+```
+
+The script prints the credentials for each account. Default logins are:
+
+**Nurses**
+- `nurse1@example.com` / `nursepass`
+- `nurse2@example.com` / `nursepass`
+- `nurse3@example.com` / `nursepass`
+
+**Patients**
+- `patient1@example.com` / `patientpass`
+- `patient2@example.com` / `patientpass`
+
+All accounts share a fixed location near Times Square in New York City so you can reliably test nearby search and booking features.
