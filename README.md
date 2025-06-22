@@ -96,6 +96,16 @@ Your frontend is built using Vite.
     ```
     The Vite development server will start, typically on `http://localhost:5173` (or the next available port). Open this URL in your web browser.
 
+## Combined Development Mode
+
+After the initial setup you can run both the backend and frontend together from the repository root:
+
+```bash
+npm run dev:all
+```
+
+This uses `concurrently` to start the API server in `api/` and the Vite dev server so you can develop in one terminal window.
+
 ## Using the Application
 
 *   Ensure both the backend API server and the frontend Vite development server are running.
@@ -145,3 +155,52 @@ The script prints the credentials for each account. Default logins are:
 - `patient2@example.com` / `patientpass`
 
 All accounts share a fixed location near Times Square in New York City so you can reliably test nearby search and booking features.
+
+## Example End-to-End Demo
+
+Follow these steps to simulate a patient creating a service request and a nurse accepting it using the API directly.
+
+1. **Start the servers** (after running the seed command above):
+
+   ```bash
+   npm run dev:all
+   ```
+
+2. **Log in as a patient** to obtain a JWT and the `patient_id`:
+
+   ```bash
+   curl -X POST http://localhost:5001/api/auth/patient/login \
+     -H 'Content-Type: application/json' \
+     -d '{"email":"patient1@example.com","password":"patientpass"}'
+   ```
+
+   Copy the `token` and `patient.patient_id` values from the JSON response.
+
+3. **Create a service order** using the patient token and id:
+
+   ```bash
+   curl -X POST http://localhost:5001/api/orders \
+     -H 'Content-Type: application/json' \
+     -H "Authorization: Bearer PATIENT_TOKEN" \
+     -d '{"orderId":"demo_order1","patientId":"PATIENT_ID","serviceDetails":{"serviceType":"wound_care","description":"Demo visit"},"location":{"address":{"street":"123 Main St","city":"New York","state":"NY","zipCode":"10001"},"coordinates":[-73.9855,40.7580],"locationType":"home"}}'
+   ```
+
+4. **Log in as a nurse** and capture the `nurse_id` and token:
+
+   ```bash
+   curl -X POST http://localhost:5001/api/auth/nurse/login \
+     -H 'Content-Type: application/json' \
+     -d '{"email":"nurse1@example.com","password":"nursepass"}'
+   ```
+
+5. **Accept the order** using the nurse token and id:
+
+   ```bash
+   curl -X PUT http://localhost:5001/api/orders/demo_order1/accept \
+     -H 'Content-Type: application/json' \
+     -H "Authorization: Bearer NURSE_TOKEN" \
+     -d '{"nurseId":"NURSE_ID"}'
+   ```
+
+The response will show the order marked as `accepted`, demonstrating the end-to-end interaction without relying on the unfinished frontend pages.
+
