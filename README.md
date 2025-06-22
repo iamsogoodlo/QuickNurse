@@ -99,7 +99,13 @@ Your frontend is built using Vite.
     ```
     If no `.env` file is provided, the app falls back to `http://localhost:5001/api` for local development.
 
-4.  **Run the Frontend Development Server:**
+4.  **Provide a Google Maps API Key:**
+    The map feature now loads Google Maps. Add your key to `.env`:
+    ```bash
+    echo "VITE_GOOGLE_MAPS_API_KEY=YOUR_KEY_HERE" >> .env
+    ```
+
+5.  **Run the Frontend Development Server:**
     ```bash
     npm run dev
     ```
@@ -168,16 +174,12 @@ All accounts share a fixed location near Times Square in New York City so you ca
 
 ## Example End-to-End Demo
 
-1. **Start the servers** (after running the seed command above):
-
-   ```bash
    curl -X POST http://localhost:5001/api/auth/patient/login \
      -H 'Content-Type: application/json' \
      -d '{"email":"patient1@example.com","password":"patientpass"}'
    ```
 
    Copy the `token` and `patient.patient_id` values from the JSON response.
-
 
    ```bash
    curl -X POST http://localhost:5001/api/orders \
@@ -197,4 +199,3 @@ All accounts share a fixed location near Times Square in New York City so you ca
      -d '{"nurseId":"NURSE_ID"}'
    ```
 
-The response will show the order marked as `accepted`, demonstrating the end-to-end interaction without relying on the unfinished frontend pages.

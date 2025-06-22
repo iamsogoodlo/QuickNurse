@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import NurseMap from '../components/dashboard/nurse/NurseMap';
 import ServiceRequestCardNurseView from '../components/dashboard/nurse/ServiceRequestCardNurseView';
 import { ServiceRequestSummaryForNurse, OrderReceived, NurseProfile } from '../types';
 import { getPendingOrders, acceptOrder } from '../services/orderService';
@@ -96,7 +95,7 @@ const NurseDashboardPage: React.FC = () => {
 
           <div className="bg-white rounded-2xl shadow p-6">
             <h2 className="text-lg font-semibold mb-4">Live Map</h2>
-            <NurseMap />
+            <UserLocationMap />
           </div>
 
           <div className="bg-white rounded-2xl shadow p-6">

@@ -23,9 +23,6 @@ const RequestServiceModal: React.FC<Props> = ({ isOpen, onClose, defaultServiceT
     e.preventDefault();
     if (userType !== 'patient' || !user || !token) return;
     const patient = user as PatientProfile;
-    if (!patient.address?.coordinates) {
-      setMessage('Patient profile missing coordinates.');
-      return;
     }
     setIsSubmitting(true);
     const payload = {
@@ -34,7 +31,6 @@ const RequestServiceModal: React.FC<Props> = ({ isOpen, onClose, defaultServiceT
       serviceDetails: { serviceType: defaultServiceType, description },
       location: {
         type: 'Point' as const,
-        coordinates: patient.address.coordinates as [number, number],
         address: {
           street: patient.address.street,
           city: patient.address.city,
