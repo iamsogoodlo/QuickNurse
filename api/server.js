@@ -11,7 +11,7 @@ const documentRoutes = require('./routes/documents');
 const nurseRequestRoutes = require('./routes/nurse-requests');
 // Add other route imports here if you create them:
 // const patientRoutes = require('./routes/patients');
-const serviceRequestRoutes = require('./routes/serviceRequests');
+const { router: serviceRequestRoutes } = require('./routes/serviceRequests');
 const ordersRoutes = require('./routes/orders');
 
 

@@ -1,44 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NurseMap from '../components/dashboard/nurse/NurseMap';
 import ServiceRequestCardNurseView from '../components/dashboard/nurse/ServiceRequestCardNurseView';
-import { ServiceRequestSummaryForNurse } from '../types';
-
-const mockNearbyRequests: ServiceRequestSummaryForNurse[] = [
-  {
-    request_id: '1',
-    patient_display_name: 'Patient J.D.',
-    service_type: 'Wound Care',
-    approx_distance_miles: 2,
-    patient_city_state: 'San Francisco, CA',
-    estimated_earnings: 50,
-    requested_at: new Date().toISOString(),
-    status: 'pending',
-  },
-  {
-    request_id: '2',
-    patient_display_name: 'Patient A.B.',
-    service_type: 'IV Therapy',
-    approx_distance_miles: 3,
-    patient_city_state: 'San Francisco, CA',
-    estimated_earnings: 70,
-    requested_at: new Date().toISOString(),
-    status: 'pending',
-  },
-];
+import { ServiceRequestSummaryForNurse, PatientProfile, NurseProfile } from '../types';
+import { useAuth } from '../hooks/useAuth';
+import { getPendingRequestsForNurse, acceptServiceRequest } from '../services/serviceRequestService';
 
 const NurseDashboardPage: React.FC = () => {
   const [isOnline, setIsOnline] = useState(false);
-  const [nearbyRequests, setNearbyRequests] = useState(mockNearbyRequests);
+  const [nearbyRequests, setNearbyRequests] = useState<ServiceRequestSummaryForNurse[]>([]);
   const [activeRequest, setActiveRequest] = useState<ServiceRequestSummaryForNurse | null>(null);
+  const { user, token, userType } = useAuth();
+
+  useEffect(() => {
+    if (userType !== 'nurse' || !user) return;
+    const nurse = user as NurseProfile;
+    getPendingRequestsForNurse(nurse.nurse_id, token).then(res => {
+      if (res.success && res.data) {
+        setNearbyRequests(res.data as unknown as ServiceRequestSummaryForNurse[]);
+      }
+    });
+  }, [user, token, userType]);
 
   const toggleOnline = () => setIsOnline((prev) => !prev);
 
   const handleAccept = (id: string) => {
-    const req = nearbyRequests.find((r) => r.request_id === id);
-    if (req) {
-      setActiveRequest(req);
-      setNearbyRequests(nearbyRequests.filter((r) => r.request_id !== id));
-    }
+    if (userType !== 'nurse' || !user) return;
+    const nurse = user as NurseProfile;
+    acceptServiceRequest(id, nurse.nurse_id, token).then(res => {
+      if (res.success && res.data) {
+        setActiveRequest(res.data as unknown as ServiceRequestSummaryForNurse);
+        setNearbyRequests(nearbyRequests.filter(r => r.request_id !== id));
+      }
+    });
   };
 
   const handleDecline = (id: string) => {

@@ -1,10 +1,13 @@
 
 import React from 'react';
-import { NearbyNurse } from '../../../types';
+import { NearbyNurse, PatientProfile } from '../../../types';
+import { useAuth } from '../../../hooks/useAuth';
+import { createServiceRequest } from '../../../services/serviceRequestService';
 import Button from '../../common/Button';
 
 interface NurseCardProps {
   nurse: NearbyNurse;
+  serviceType: string;
 }
 
 const StarIcon: React.FC<{ filled: boolean }> = ({ filled }) => (
@@ -14,11 +17,26 @@ const StarIcon: React.FC<{ filled: boolean }> = ({ filled }) => (
 );
 
 
-const NurseCard: React.FC<NurseCardProps> = ({ nurse }) => {
-  const handleRequestService = () => {
-    // Placeholder for service request functionality
-    alert(`Service request for ${nurse.first_name} ${nurse.last_name} initiated (not implemented yet).`);
-    // In a real app, this would open a modal or navigate to a request page
+const NurseCard: React.FC<NurseCardProps> = ({ nurse, serviceType }) => {
+  const { user, token, userType } = useAuth();
+
+  const handleRequestService = async () => {
+    if (userType !== 'patient' || !user) return;
+    const patient = user as PatientProfile;
+    const payload = {
+      patient_id: patient.patient_id,
+      nurse_id: nurse.nurse_id,
+      service_type: serviceType,
+      patient_location: patient.address.coordinates
+        ? { type: 'Point' as const, coordinates: patient.address.coordinates }
+        : undefined,
+    };
+    const res = await createServiceRequest(payload, token);
+    if (res.success) {
+      alert('Service request created.');
+    } else {
+      alert('Failed to create request');
+    }
   };
 
   const renderStars = (rating: number) => {
@@ -33,14 +51,17 @@ const NurseCard: React.FC<NurseCardProps> = ({ nurse }) => {
     <div className="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300">
       <div className="p-6">
         <div className="flex items-center mb-4">
-          <img 
-            src={`https://picsum.photos/seed/${nurse.nurse_id}/80/80`} 
+          <img
+            src={`https://picsum.photos/seed/${nurse.nurse_id}/80/80`}
             alt={`${nurse.first_name} ${nurse.last_name}`}
             className="w-20 h-20 rounded-full mr-4 border-2 border-teal-500"
           />
           <div>
             <h3 className="text-xl font-semibold text-gray-800">{nurse.first_name} {nurse.last_name}</h3>
             <p className="text-sm text-teal-600">{nurse.specialties.slice(0,2).map(s => s.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())).join(', ')}</p>
+            {!nurse.is_online && (
+              <p className="text-xs text-red-500 mt-1">Currently Offline</p>
+            )}
           </div>
         </div>
 
@@ -59,8 +80,13 @@ const NurseCard: React.FC<NurseCardProps> = ({ nurse }) => {
             <p className="text-xs text-gray-500 text-center">Includes base, distance, and potential surge.</p>
         </div>
         
-        <Button onClick={handleRequestService} variant="primary" fullWidth>
-          Request Service
+        <Button
+          onClick={handleRequestService}
+          variant="primary"
+          fullWidth
+          disabled={!nurse.is_online}
+        >
+          {nurse.is_online ? 'Request Service' : 'Offline'}
         </Button>
       </div>
     </div>
