@@ -102,7 +102,9 @@ router.get('/nearby', async (req, res) => {
         }
       },
       account_status: 'active',
-      verification_status: 'verified'
+      verification_status: 'verified',
+      is_online: true,
+      current_status: 'available'
     };
 
     if (specialty && specialty !== 'all') {
