@@ -3,7 +3,6 @@ import Button from '../../common/Button';
 import Input from '../../common/Input';
 import { useAuth } from '../../../hooks/useAuth';
 import { createOrder } from '../../../services/orderService';
-import { geocodeAddress } from '../../../services/geocodingService';
 import { ApiError, PatientProfile } from '../../../types';
 
 interface Props {
@@ -24,16 +23,6 @@ const RequestServiceModal: React.FC<Props> = ({ isOpen, onClose, defaultServiceT
     e.preventDefault();
     if (userType !== 'patient' || !user || !token) return;
     const patient = user as PatientProfile;
-    let coords = patient.address.coordinates;
-    if (!coords) {
-      const geo = await geocodeAddress(
-        `${patient.address.street}, ${patient.address.city}, ${patient.address.state} ${patient.address.zip_code}`
-      );
-      if (!geo) {
-        setMessage('Unable to determine coordinates from address.');
-        return;
-      }
-      coords = [geo[1], geo[0]]; // GeoJSON expects [lng, lat]
     }
     setIsSubmitting(true);
     const payload = {
@@ -42,7 +31,6 @@ const RequestServiceModal: React.FC<Props> = ({ isOpen, onClose, defaultServiceT
       serviceDetails: { serviceType: defaultServiceType, description },
       location: {
         type: 'Point' as const,
-        coordinates: coords as [number, number],
         address: {
           street: patient.address.street,
           city: patient.address.city,

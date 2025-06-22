@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import UserLocationMap from '../components/common/UserLocationMap';
 import ServiceRequestCardNurseView from '../components/dashboard/nurse/ServiceRequestCardNurseView';
 import { ServiceRequestSummaryForNurse, OrderReceived, NurseProfile } from '../types';
 import { getPendingOrders, acceptOrder } from '../services/orderService';

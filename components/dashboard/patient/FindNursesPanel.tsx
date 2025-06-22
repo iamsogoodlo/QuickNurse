@@ -8,10 +8,6 @@ import Button from '../../common/Button';
 import Select from '../../common/Select';
 import LoadingSpinner from '../../common/LoadingSpinner';
 import NurseCard from './NurseCard';
-import { NURSE_SPECIALTY_OPTIONS, CA_PROVINCES } from '../../../constants';
-import RequestServiceModal from './RequestServiceModal';
-import UserLocationMap from '../../common/UserLocationMap';
-import { geocodeAddress } from '../../../services/geocodingService';
 
 const FindNursesPanel: React.FC = () => {
   const [street, setStreet] = useState<string>('');
@@ -30,13 +26,6 @@ const FindNursesPanel: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalServiceType, setModalServiceType] = useState<string>('general');
 
-  const handleUseCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(p => {
-        setCoords({ lat: p.coords.latitude, lng: p.coords.longitude });
-      });
-    }
-  };
 
   useEffect(() => {
     if (userType === 'patient' && user) {
