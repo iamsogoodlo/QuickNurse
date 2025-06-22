@@ -95,6 +95,48 @@ Your frontend is built using Vite.
 *   Access the frontend URL (e.g., `http://localhost:5173`) in your browser.
 *   You should be able to register, log in, and use the application features.
 
+## Building a Windows EXE with Electron
+
+This repository now includes a minimal Electron wrapper so the React app can be
+packaged as a desktop executable:
+
+0.  Ensure your `package.json` has `"main": "electron.js"` so Electron knows
+    which file to launch (this repo already sets it).
+
+1.  Install dependencies (if you haven't already):
+    ```bash
+    npm install
+    ```
+2.  Build the frontend so Electron can load the static files:
+    ```bash
+    npm run build
+    ```
+3.  Launch the desktop version in development:
+    ```bash
+    npm run electron-dev
+    ```
+    This opens an Electron window loading `http://localhost:5173`.
+4.  To create a Windows `.exe`:
+    ```bash
+    npm run package-win
+    ```
+
+    The generated executable will be placed in the `dist-electron/` folder.
+
+## Deploying to GoDaddy (quicknurse.ca)
+
+To host QuickNurse on your GoDaddy domain, use a plan that supports Node.js or a VPS:
+
+1. **Upload the code** – Copy both the backend (`api` directory) and frontend files to your server via FTP, Git, or GoDaddy's file manager.
+2. **Install dependencies** – On the server, run `npm install` inside the project root and again inside `api/`.
+3. **Configure environment variables** – Create `api/.env` with `MONGODB_URI`, `JWT_SECRET`, and `PORT` values.
+4. **Build the frontend** – In the root, run `npm run build` to generate the `dist/` folder.
+5. **Serve with Node** – Modify `api/server.js` (or your Express server) to serve the `dist/` folder using `express.static` so both API and static files share the same server.
+6. **Use a process manager** – Start the backend with `pm2` or similar to keep the Node app running.
+7. **Update DNS** – Point `quicknurse.ca` to your server's IP (or CNAME) in GoDaddy's DNS manager.
+
+Once DNS propagation completes, navigating to `https://quicknurse.ca` should load the application.
+
 ## Troubleshooting
 
 *   **`sh: vite: command not found` (Frontend):** Make sure you have run `npm install` in your frontend project directory.
