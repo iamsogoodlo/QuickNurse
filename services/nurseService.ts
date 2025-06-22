@@ -1,12 +1,11 @@
-
 import { apiService } from './api';
 import { NURSE_ENDPOINTS, API_BASE_URL } from '../constants';
 import { ApiResponse, NearbyNurse, NurseProfile, NurseStatus, NurseDashboardStats } from '../types';
 
 export const findNearbyNurses = async (
-  lat: number, 
-  lng: number, 
-  radius: number = 15, 
+  lat: number,
+  lng: number,
+  radius: number = 15,
   specialty?: string,
   service_type: string = 'general',
   token?: string | null
@@ -36,8 +35,8 @@ export const updateNurseStatus = async (
 };
 
 export const getNurseProfile = async (token: string): Promise<ApiResponse<NurseProfile>> => {
-    // Assumed endpoint, not in provided backend code
-    return apiService<NurseProfile>(NURSE_ENDPOINTS.PROFILE, 'GET', undefined, token);
+  // Assumed endpoint, not in provided backend code
+  return apiService<NurseProfile>(NURSE_ENDPOINTS.PROFILE, 'GET', undefined, token);
 };
 
 export const updateNurseProfile = async (
