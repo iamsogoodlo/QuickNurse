@@ -24,10 +24,15 @@ const UserLocationMap: React.FC<Props> = ({ latitude, longitude }) => {
     }
   }, [latitude, longitude]);
 
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
   const center: GoogleLatLng = position || { lat: 37.7749, lng: -122.4194 };
 
+  if (!apiKey) {
+    return <div className="text-sm text-gray-500">Map unavailable</div>;
+  }
+
   return (
-    <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''}>
+    <LoadScript googleMapsApiKey={apiKey}>
       <GoogleMap mapContainerStyle={{ height: '250px', width: '100%' }} center={center} zoom={13}>
         {position && <Marker position={position} />}
       </GoogleMap>

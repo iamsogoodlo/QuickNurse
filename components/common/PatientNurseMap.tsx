@@ -12,10 +12,20 @@ interface Props {
 }
 
 const PatientNurseMap: React.FC<Props> = ({ patient, nurse }) => {
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
   const center = patient;
+
+  if (!apiKey) {
+    return <div className="text-sm text-gray-500">Map unavailable</div>;
+  }
+
   return (
-    <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''}>
-      <GoogleMap mapContainerStyle={{ height: '250px', width: '100%' }} center={center} zoom={14}>
+    <LoadScript googleMapsApiKey={apiKey}>
+      <GoogleMap
+        mapContainerStyle={{ height: '250px', width: '100%' }}
+        center={center}
+        zoom={14}
+      >
         <Marker position={patient} label="Patient" />
         <Marker position={nurse} label="Nurse" />
       </GoogleMap>
