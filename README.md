@@ -174,21 +174,6 @@ All accounts share a fixed location near Times Square in New York City so you ca
 
 ## Example End-to-End Demo
 
-Follow these steps from the project root to simulate a patient creating a service request and a nurse accepting it using the API directly.
-
-1. **Start the servers** (after running the seed command above):
-
-   ```bash
-   cd path/to/QuickNurse
-   npm run dev:all
-   ```
-
-   Keep this terminal running.
-
-2. **Open another terminal** in the same directory and run the cURL commands below.
-3. **Log in as a patient** to obtain a JWT and the `patient_id`:
-
-   ```bash
    curl -X POST http://localhost:5001/api/auth/patient/login \
      -H 'Content-Type: application/json' \
      -d '{"email":"patient1@example.com","password":"patientpass"}'
@@ -196,24 +181,16 @@ Follow these steps from the project root to simulate a patient creating a servic
 
    Copy the `token` and `patient.patient_id` values from the JSON response.
 
-4. **Create a service order** using the patient token and id:
-
    ```bash
    curl -X POST http://localhost:5001/api/orders \
      -H 'Content-Type: application/json' \
      -H "Authorization: Bearer PATIENT_TOKEN" \
-     -d '{"orderId":"demo_order1","patientId":"PATIENT_ID","serviceDetails":{"serviceType":"wound_care","description":"Demo visit"},"location":{"type":"Point","coordinates":[-73.9855,40.7580],"address":{"street":"123 Main St","city":"New York","state":"NY","zipCode":"10001"},"locationType":"home"}}'
-  ```
-
-5. **Log in as a nurse** and capture the `nurse_id` and token:
 
    ```bash
    curl -X POST http://localhost:5001/api/auth/nurse/login \
      -H 'Content-Type: application/json' \
      -d '{"email":"nurse1@example.com","password":"nursepass"}'
    ```
-
-6. **Accept the order** using the nurse token and id:
 
    ```bash
    curl -X PUT http://localhost:5001/api/orders/demo_order1/accept \
@@ -222,4 +199,3 @@ Follow these steps from the project root to simulate a patient creating a servic
      -d '{"nurseId":"NURSE_ID"}'
    ```
 
-The response will show the order marked as `accepted`, demonstrating the end-to-end interaction without relying on the unfinished frontend pages.
