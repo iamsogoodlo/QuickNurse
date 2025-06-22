@@ -29,8 +29,11 @@ export const PATIENT_ENDPOINTS = {
 
 export const SERVICE_REQUEST_ENDPOINTS = {
   CREATE: API_BASE_URL + '/servicerequests', // Assumed endpoint
-  PATIENT_REQUESTS: API_BASE_URL + '/servicerequests/patient', // Assumed endpoint
-  NURSE_REQUESTS: API_BASE_URL + '/servicerequests/nurse', // Assumed endpoint
+};
+
+export const REQUESTS_ENDPOINTS = {
+  PENDING_FOR_NURSE: API_BASE_URL + '/requests/pending-for-nurse',
+  ACCEPT: API_BASE_URL + '/requests',
 };
 
 export const LICENSE_TYPE_OPTIONS = Object.values(LicenseType);

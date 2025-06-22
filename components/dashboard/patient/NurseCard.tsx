@@ -1,10 +1,13 @@
 
 import React from 'react';
-import { NearbyNurse } from '../../../types';
+import { NearbyNurse, PatientProfile } from '../../../types';
+import { useAuth } from '../../../hooks/useAuth';
+import { createServiceRequest } from '../../../services/serviceRequestService';
 import Button from '../../common/Button';
 
 interface NurseCardProps {
   nurse: NearbyNurse;
+  serviceType: string;
 }
 
 const StarIcon: React.FC<{ filled: boolean }> = ({ filled }) => (
@@ -14,11 +17,26 @@ const StarIcon: React.FC<{ filled: boolean }> = ({ filled }) => (
 );
 
 
-const NurseCard: React.FC<NurseCardProps> = ({ nurse }) => {
-  const handleRequestService = () => {
-    // Placeholder for service request functionality
-    alert(`Service request for ${nurse.first_name} ${nurse.last_name} initiated (not implemented yet).`);
-    // In a real app, this would open a modal or navigate to a request page
+const NurseCard: React.FC<NurseCardProps> = ({ nurse, serviceType }) => {
+  const { user, token, userType } = useAuth();
+
+  const handleRequestService = async () => {
+    if (userType !== 'patient' || !user) return;
+    const patient = user as PatientProfile;
+    const payload = {
+      patient_id: patient.patient_id,
+      nurse_id: nurse.nurse_id,
+      service_type: serviceType,
+      patient_location: patient.address.coordinates
+        ? { type: 'Point' as const, coordinates: patient.address.coordinates }
+        : undefined,
+    };
+    const res = await createServiceRequest(payload, token);
+    if (res.success) {
+      alert('Service request created.');
+    } else {
+      alert('Failed to create request');
+    }
   };
 
   const renderStars = (rating: number) => {
