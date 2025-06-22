@@ -1,35 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NurseMap from '../components/dashboard/nurse/NurseMap';
 import ServiceRequestCardNurseView from '../components/dashboard/nurse/ServiceRequestCardNurseView';
-import { ServiceRequestSummaryForNurse } from '../types';
+import { ServiceRequestSummaryForNurse, ServiceRequest } from '../types';
+import { useAuth } from '../hooks/useAuth';
+import { SOCKET_BASE_URL } from '../constants';
+import { io } from 'socket.io-client';
 
-const mockNearbyRequests: ServiceRequestSummaryForNurse[] = [
-  {
-    request_id: '1',
-    patient_display_name: 'Patient J.D.',
-    service_type: 'Wound Care',
-    approx_distance_miles: 2,
-    patient_city_state: 'San Francisco, CA',
-    estimated_earnings: 50,
-    requested_at: new Date().toISOString(),
-    status: 'pending',
-  },
-  {
-    request_id: '2',
-    patient_display_name: 'Patient A.B.',
-    service_type: 'IV Therapy',
-    approx_distance_miles: 3,
-    patient_city_state: 'San Francisco, CA',
-    estimated_earnings: 70,
-    requested_at: new Date().toISOString(),
-    status: 'pending',
-  },
-];
+const mockNearbyRequests: ServiceRequestSummaryForNurse[] = [];
 
 const NurseDashboardPage: React.FC = () => {
+  const { user, token } = useAuth();
   const [isOnline, setIsOnline] = useState(false);
   const [nearbyRequests, setNearbyRequests] = useState(mockNearbyRequests);
   const [activeRequest, setActiveRequest] = useState<ServiceRequestSummaryForNurse | null>(null);
+
+  useEffect(() => {
+    if (!user || !(user as any).nurse_id) return;
+    const socket = io(SOCKET_BASE_URL, { auth: { token } });
+    socket.emit('join', { role: 'nurse', id: (user as any).nurse_id });
+    socket.on('new_request', (req: ServiceRequest) => {
+      const summary: ServiceRequestSummaryForNurse = {
+        request_id: req.request_id,
+        patient_display_name: 'Patient',
+        service_type: req.service_type,
+        patient_city_state: req.patient_address?.city ? `${req.patient_address.city}, ${req.patient_address.state}` : '',
+        estimated_earnings: req.nurse_earnings || 0,
+        requested_at: req.requested_at,
+        status: 'pending',
+      };
+      setNearbyRequests(prev => [...prev, summary]);
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [user, token]);
 
   const toggleOnline = () => setIsOnline((prev) => !prev);
 

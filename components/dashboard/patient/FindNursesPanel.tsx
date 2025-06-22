@@ -155,7 +155,13 @@ const FindNursesPanel: React.FC = () => {
               <h3 className="text-lg font-medium text-gray-700 mb-4">Available Nurses ({nurses.length})</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-x-6 gap-y-8"> {/* Adjusted for potentially 2 cards per row on larger screens in this layout */}
                 {nurses.map(nurse => (
-                  <NurseCard key={nurse.nurse_id} nurse={nurse} />
+                  <NurseCard
+                    key={nurse.nurse_id}
+                    nurse={nurse}
+                    serviceType={serviceType}
+                    lat={lat}
+                    lng={lng}
+                  />
                 ))}
               </div>
             </div>

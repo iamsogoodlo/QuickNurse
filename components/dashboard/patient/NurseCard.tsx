@@ -3,8 +3,15 @@ import React from 'react';
 import { NearbyNurse } from '../../../types';
 import Button from '../../common/Button';
 
+import { useAuth } from '../../../hooks/useAuth';
+import { createServiceRequest } from '../../../services/serviceRequestService';
+import { PatientProfile } from '../../../types';
+
 interface NurseCardProps {
   nurse: NearbyNurse;
+  serviceType: string;
+  lat: string;
+  lng: string;
 }
 
 const StarIcon: React.FC<{ filled: boolean }> = ({ filled }) => (
@@ -14,11 +21,33 @@ const StarIcon: React.FC<{ filled: boolean }> = ({ filled }) => (
 );
 
 
-const NurseCard: React.FC<NurseCardProps> = ({ nurse }) => {
-  const handleRequestService = () => {
-    // Placeholder for service request functionality
-    alert(`Service request for ${nurse.first_name} ${nurse.last_name} initiated (not implemented yet).`);
-    // In a real app, this would open a modal or navigate to a request page
+const NurseCard: React.FC<NurseCardProps> = ({ nurse, serviceType, lat, lng }) => {
+  const { user, token } = useAuth();
+
+  const handleRequestService = async () => {
+    if (!user || !(user as PatientProfile).patient_id) {
+      alert('Only patients can request a service.');
+      return;
+    }
+    const patient = user as PatientProfile;
+    const payload = {
+      patient_id: patient.patient_id,
+      nurse_id: nurse.nurse_id,
+      service_type: serviceType,
+      patient_location: { type: 'Point', coordinates: [parseFloat(lng), parseFloat(lat)] },
+      patient_address: patient.address,
+      service_base_price: nurse.pricing.breakdown.basePrice,
+      total_price: nurse.pricing.totalPrice,
+      nurse_earnings: nurse.pricing.nurseEarnings,
+      platform_fee: nurse.pricing.platformFee,
+    };
+    const res = await createServiceRequest(payload, token);
+    if (res.success) {
+      alert('Service request submitted!');
+    } else {
+      const err = typeof res.error === 'string' ? res.error : (res.error as any)?.message;
+      alert('Failed to create request: ' + (err || 'unknown error'));
+    }
   };
 
   const renderStars = (rating: number) => {
